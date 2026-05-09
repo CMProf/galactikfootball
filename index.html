@@ -1242,7 +1242,7 @@ function renderRelier(card,step){
   card.innerHTML=`<div class="q-text">🔗 Relie chaque infinitif à son participe passé.</div>`;
 
   const wrap=document.createElement('div');
-  wrap.style.cssText='position:relative;display:flex;gap:16px;';
+  wrap.className='relier-container';
   const svgEl=document.createElementNS('http://www.w3.org/2000/svg','svg');
   svgEl.style.cssText='position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:0;';
   svgEl.setAttribute('width','100%');svgEl.setAttribute('height','100%');
@@ -1312,7 +1312,7 @@ function handleRelierClick(el){
   const rightEl  = side==='right' ? el : relierState.selected;
 
   // find pair in card
-  const wrap=el.closest('div[style*="position:relative"]');
+  const wrap=el.closest('.relier-container');
   const pair=wrap._pairs.find(p=>p.left===leftVal && p.right===rightVal);
 
   relierState.selected.classList.remove('selected');
