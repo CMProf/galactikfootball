@@ -6,967 +6,1990 @@
 <title>Galactik Football — Mission Conjugaison</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --snow: #e8f4ff;
-    --blue-deep: #0a1628;
-    --blue-mid: #0d2a5c;
-    --blue-bright: #1a6ef5;
-    --blue-glow: #4da6ff;
-    --gold: #ffd93d;
-    --gold-dark: #e6b800;
-    --red: #ff4455;
-    --green-ok: #2ecc71;
-    --purple: #8b5cf6;
-    --text-main: #e8f4ff;
-    --text-muted: #8ab3d4;
-    --panel: rgba(13,42,92,0.85);
-    --panel-border: rgba(77,166,255,0.25);
-  }
+/* ═══════════════════════════════════════════════
+   VARIABLES & RESET
+═══════════════════════════════════════════════ */
+:root {
+  --snow:#e8f4ff; --deep:#07111f; --mid:#0d2346;
+  --bright:#1a6ef5; --glow:#4da6ff;
+  --gold:#ffd93d; --gold-d:#d4a017;
+  --red:#ff3b4e; --green:#2ecc71; --purple:#8b5cf6;
+  --panel:rgba(10,30,70,0.88); --border:rgba(77,166,255,0.2);
+  --text:var(--snow); --muted:#7ba8cc;
+  --radius:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{font-size:16px;}
+body{font-family:'Nunito',sans-serif;background:var(--deep);color:var(--text);min-height:100vh;overflow-x:hidden;}
 
-  * { margin:0; padding:0; box-sizing:border-box; }
+/* ═══════════════════════════════════════════════
+   STARFIELD
+═══════════════════════════════════════════════ */
+#starfield{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.star{position:absolute;border-radius:50%;background:#fff;opacity:.15;animation:twk 3s infinite alternate;}
+@keyframes twk{to{opacity:.9;}}
 
-  body {
-    font-family: 'Nunito', sans-serif;
-    background: var(--blue-deep);
-    color: var(--text-main);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+/* ═══════════════════════════════════════════════
+   PAGES
+═══════════════════════════════════════════════ */
+.page{position:relative;z-index:1;min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;padding:1rem;}
+.page.active{display:flex;}
+.fade-in{animation:fi .5s ease both;}
+@keyframes fi{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
 
-  /* ===== STARFIELD ===== */
-  #starfield {
-    position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    background: radial-gradient(ellipse at 20% 50%, #0d1a3a 0%, #050c1a 100%);
-  }
-  .star {
-    position: absolute; border-radius: 50%;
-    background: white; animation: twinkle 3s infinite alternate;
-  }
-  @keyframes twinkle { from { opacity: 0.2; } to { opacity: 1; } }
+/* ═══════════════════════════════════════════════
+   TYPOGRAPHY
+═══════════════════════════════════════════════ */
+.orb{font-family:'Orbitron',monospace;}
+.logo{font-family:'Orbitron',monospace;font-size:clamp(1.6rem,5vw,3.2rem);font-weight:900;color:var(--gold);text-shadow:0 0 40px rgba(255,217,61,.6);letter-spacing:.06em;line-height:1.1;}
+.sub-logo{font-family:'Orbitron',monospace;font-size:.75rem;letter-spacing:.35em;color:var(--glow);margin:.3rem 0 1.5rem;}
 
-  /* ===== PAGES ===== */
-  .page { position: relative; z-index: 1; min-height: 100vh; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 1rem; }
-  .page.active { display: flex; }
+/* ═══════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════ */
+.btn{font-family:'Orbitron',monospace;font-size:.8rem;font-weight:700;letter-spacing:.06em;padding:.7rem 1.8rem;border:none;border-radius:50px;cursor:pointer;transition:all .18s;text-transform:uppercase;display:inline-flex;align-items:center;gap:6px;}
+.btn:active{transform:scale(.96);}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-d));color:var(--deep);box-shadow:0 4px 20px rgba(255,217,61,.35);}
+.btn-gold:hover{box-shadow:0 6px 30px rgba(255,217,61,.6);transform:translateY(-2px);}
+.btn-blue{background:linear-gradient(135deg,var(--bright),#0b3fa8);color:#fff;box-shadow:0 4px 20px rgba(26,110,245,.35);}
+.btn-blue:hover{box-shadow:0 6px 30px rgba(26,110,245,.6);transform:translateY(-2px);}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover{color:var(--snow);border-color:var(--glow);}
+.btn-sm{font-size:.68rem;padding:.45rem 1rem;}
+.btn-danger{background:linear-gradient(135deg,#c0392b,#922b21);color:#fff;}
 
-  /* ===== INTRO ===== */
-  #page-intro { text-align: center; }
-  .logo-gf {
-    font-family: 'Orbitron', monospace;
-    font-size: clamp(1.8rem, 5vw, 3.5rem);
-    font-weight: 900;
-    letter-spacing: 0.08em;
-    color: var(--gold);
-    text-shadow: 0 0 30px rgba(255,217,61,0.6), 0 0 60px rgba(255,217,61,0.2);
-    animation: pulse-gold 2.5s ease-in-out infinite;
-    line-height: 1.1;
-  }
-  @keyframes pulse-gold { 0%,100% { text-shadow: 0 0 30px rgba(255,217,61,0.6); } 50% { text-shadow: 0 0 60px rgba(255,217,61,1), 0 0 100px rgba(255,217,61,0.4); } }
-  .subtitle-intro {
-    font-family: 'Orbitron', monospace;
-    font-size: clamp(0.7rem, 2vw, 1rem);
-    letter-spacing: 0.3em;
-    color: var(--blue-glow);
-    text-transform: uppercase;
-    margin: 0.4rem 0 2rem;
-  }
+/* ═══════════════════════════════════════════════
+   CARDS / PANELS
+═══════════════════════════════════════════════ */
+.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.5rem;backdrop-filter:blur(8px);}
+.badge-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(26,110,245,.18);border:1px solid rgba(26,110,245,.35);border-radius:50px;padding:3px 12px;font-family:'Orbitron',monospace;font-size:.6rem;color:var(--glow);letter-spacing:.05em;}
+.lesson-box{background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);border-radius:10px;padding:.9rem 1.1rem;font-size:.88rem;color:#c4b5fd;line-height:1.65;margin-bottom:1rem;}
+.lesson-box strong{color:#a78bfa;}
+.story-panel{background:rgba(0,0,0,.25);border-left:3px solid var(--glow);border-radius:0 8px 8px 0;padding:.8rem 1rem;font-size:.92rem;line-height:1.7;color:var(--snow);margin-bottom:1rem;}
+.char-name{color:var(--gold);font-weight:700;}
 
-  .story-box {
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
-    border-radius: 16px;
-    padding: 1.5rem 2rem;
-    max-width: 680px;
-    font-size: 1rem;
-    line-height: 1.7;
-    color: var(--snow);
-    margin: 1.5rem 0;
-    text-align: left;
-    backdrop-filter: blur(10px);
-  }
-  .story-box p { margin-bottom: 0.8rem; }
-  .story-box p:last-child { margin-bottom: 0; }
-  .highlight-name { color: var(--gold); font-weight: 700; }
+/* ═══════════════════════════════════════════════
+   NAME INPUT
+═══════════════════════════════════════════════ */
+.name-input{background:rgba(13,42,92,.8);border:2px solid var(--bright);border-radius:10px;padding:.65rem 1.1rem;font-family:'Nunito',sans-serif;font-size:1.2rem;font-weight:700;color:var(--gold);text-align:center;width:240px;outline:none;transition:.25s;}
+.name-input:focus{border-color:var(--gold);box-shadow:0 0 18px rgba(255,217,61,.25);}
 
-  .name-input-wrap { margin: 1.5rem 0; display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
-  .name-input-wrap label { font-family: 'Orbitron', monospace; font-size: 0.85rem; color: var(--blue-glow); letter-spacing: 0.1em; }
-  .name-input {
-    background: rgba(13,42,92,0.8);
-    border: 2px solid var(--blue-bright);
-    border-radius: 10px;
-    padding: 0.7rem 1.2rem;
-    font-family: 'Nunito', sans-serif;
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--gold);
-    text-align: center;
-    width: 260px;
-    outline: none;
-    transition: border-color 0.3s, box-shadow 0.3s;
-  }
-  .name-input:focus { border-color: var(--gold); box-shadow: 0 0 20px rgba(255,217,61,0.3); }
+/* ═══════════════════════════════════════════════
+   VIDEO MODAL
+═══════════════════════════════════════════════ */
+#video-modal{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.95);display:none;flex-direction:column;align-items:center;justify-content:center;gap:1rem;}
+#video-modal.open{display:flex;}
+#video-modal video{width:min(90vw,800px);border-radius:12px;outline:none;}
+#video-modal .video-placeholder{width:min(90vw,640px);aspect-ratio:16/9;background:linear-gradient(135deg,#0d1a3a,#0a2b5c);border-radius:12px;border:2px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;}
 
-  /* ===== BTN ===== */
-  .btn {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.9rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    padding: 0.75rem 2rem;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-transform: uppercase;
-  }
-  .btn:active { transform: scale(0.96); }
-  .btn-gold {
-    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
-    color: var(--blue-deep);
-    box-shadow: 0 4px 20px rgba(255,217,61,0.4);
-  }
-  .btn-gold:hover { box-shadow: 0 6px 30px rgba(255,217,61,0.6); transform: translateY(-2px); }
-  .btn-blue {
-    background: linear-gradient(135deg, var(--blue-bright), #0f4db5);
-    color: white;
-    box-shadow: 0 4px 20px rgba(26,110,245,0.4);
-  }
-  .btn-blue:hover { box-shadow: 0 6px 30px rgba(26,110,245,0.6); transform: translateY(-2px); }
-  .btn-ghost {
-    background: transparent;
-    color: var(--text-muted);
-    border: 1px solid var(--panel-border);
-  }
-  .btn-ghost:hover { color: var(--snow); border-color: var(--blue-glow); }
-  .btn-sm { font-size: 0.75rem; padding: 0.5rem 1.2rem; }
+/* ═══════════════════════════════════════════════
+   TEAM PAGE
+═══════════════════════════════════════════════ */
+#page-team{background:linear-gradient(180deg,rgba(7,17,31,0) 0%,rgba(7,17,31,.7) 100%);padding:2rem 1rem;}
+.team-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;max-width:760px;margin:1.5rem auto;}
+.player-medal{width:110px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:.2s;}
+.player-medal:hover{transform:translateY(-4px);}
+.medal-img{width:90px;height:90px;border-radius:50%;border:3px solid var(--border);overflow:hidden;background:var(--mid);display:flex;align-items:center;justify-content:center;font-size:2.5rem;transition:.2s;}
+.player-medal:hover .medal-img{border-color:var(--gold);box-shadow:0 0 20px rgba(255,217,61,.3);}
+.medal-img img{width:100%;height:100%;object-fit:cover;}
+.medal-name{font-family:'Orbitron',monospace;font-size:.6rem;color:var(--gold);text-align:center;font-weight:700;}
+.medal-role{font-size:.62rem;color:var(--muted);text-align:center;line-height:1.3;}
 
-  /* ===== MAP / BOARD ===== */
-  #page-map { padding: 1.5rem 1rem; justify-content: flex-start; }
-  .map-header { text-align: center; margin-bottom: 1.5rem; width: 100%; }
-  .map-header h2 { font-family: 'Orbitron', monospace; font-size: 1.3rem; color: var(--gold); }
-  .map-header p { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.3rem; }
+/* ═══════════════════════════════════════════════
+   MISSIONS PAGE
+═══════════════════════════════════════════════ */
+#page-missions{padding:1.5rem 1rem;justify-content:flex-start;}
+.missions-header{text-align:center;margin-bottom:1.2rem;}
+.missions-header h1{font-family:'Orbitron',monospace;font-size:1.6rem;color:var(--gold);}
+.missions-header p{color:var(--muted);font-size:.9rem;margin-top:.3rem;max-width:480px;}
 
-  .board-container { width: 100%; max-width: 760px; position: relative; }
-  .board-track {
-    display: flex; flex-wrap: wrap; gap: 10px;
-    justify-content: center; padding: 1rem;
-  }
+.obj-section{width:100%;max-width:760px;margin-bottom:1.5rem;}
+.obj-label{font-family:'Orbitron',monospace;font-size:.68rem;color:var(--glow);letter-spacing:.1em;margin-bottom:.6rem;padding-left:4px;}
+.missions-row{display:flex;flex-wrap:wrap;gap:10px;}
 
-  .cell {
-    width: 80px; height: 80px;
-    border-radius: 12px;
-    border: 2px solid var(--panel-border);
-    background: var(--panel);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    cursor: pointer; position: relative;
-    transition: all 0.25s;
-    font-size: 0.65rem; text-align: center;
-    color: var(--text-muted);
-    backdrop-filter: blur(4px);
-  }
-  .cell:hover { border-color: var(--blue-glow); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(77,166,255,0.2); }
-  .cell.completed { border-color: var(--green-ok); background: rgba(46,204,113,0.15); }
-  .cell.current { border-color: var(--gold); background: rgba(255,217,61,0.1); animation: cell-pulse 1.5s ease-in-out infinite; }
-  .cell.locked { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
-  .cell.start { border-color: var(--blue-glow); background: rgba(77,166,255,0.1); }
-  .cell.finish { border-color: var(--gold); background: rgba(255,217,61,0.15); }
-  @keyframes cell-pulse { 0%,100% { box-shadow: 0 0 10px rgba(255,217,61,0.3); } 50% { box-shadow: 0 0 30px rgba(255,217,61,0.7); } }
+.mission-cell{width:88px;height:88px;border-radius:12px;border:2px solid var(--border);background:var(--panel);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:.2s;text-align:center;}
+.mission-cell:hover:not(.locked){border-color:var(--glow);transform:translateY(-3px);box-shadow:0 8px 24px rgba(77,166,255,.18);}
+.mission-cell.done{border-color:var(--green);background:rgba(46,204,113,.12);}
+.mission-cell.current{border-color:var(--gold);background:rgba(255,217,61,.08);animation:cp 1.6s ease-in-out infinite;}
+.mission-cell.locked{opacity:.35;pointer-events:none;}
+@keyframes cp{0%,100%{box-shadow:0 0 8px rgba(255,217,61,.2);}50%{box-shadow:0 0 28px rgba(255,217,61,.65);}}
+.mc-num{font-family:'Orbitron',monospace;font-size:.62rem;color:var(--glow);}
+.mc-icon{font-size:1.3rem;margin:2px 0;}
+.mc-label{font-size:.56rem;color:var(--muted);line-height:1.2;padding:0 3px;}
+.mc-stars{position:absolute;top:3px;left:3px;font-size:.65rem;letter-spacing:-1px;}
+.mc-token{position:absolute;top:-8px;right:-8px;width:22px;height:22px;background:var(--gold);border-radius:50%;border:2px solid var(--deep);font-size:.65rem;display:flex;align-items:center;justify-content:center;color:var(--deep);font-weight:700;}
 
-  .cell-num { font-family: 'Orbitron', monospace; font-size: 0.7rem; font-weight: 700; color: var(--blue-glow); }
-  .cell-icon { font-size: 1.4rem; margin: 2px 0; }
-  .cell-label { font-size: 0.6rem; color: var(--text-muted); line-height: 1.2; padding: 0 4px; }
+/* global stars counter */
+.global-stars-bar{display:flex;align-items:center;gap:8px;margin:.4rem 0 1rem;font-family:'Orbitron',monospace;font-size:.7rem;color:var(--muted);}
+.gstar{font-size:1rem;transition:.3s;}
+.gstar.on{color:var(--gold);text-shadow:0 0 8px rgba(255,217,61,.5);}
+.gstar.off{color:#223;filter:grayscale(1);}
 
-  .player-token {
-    position: absolute; top: -10px; right: -10px;
-    width: 26px; height: 26px;
-    background: var(--gold);
-    border-radius: 50%;
-    border: 2px solid var(--blue-deep);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.7rem; font-weight: 700;
-    color: var(--blue-deep);
-    z-index: 2;
-    animation: bounce-token 0.6s ease-in-out;
-  }
-  @keyframes bounce-token { 0%,100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+/* ═══════════════════════════════════════════════
+   EXERCISE PAGE
+═══════════════════════════════════════════════ */
+#page-ex{padding:1rem;justify-content:flex-start;}
+.ex-top{width:100%;max-width:720px;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:.7rem;}
+.ex-breadcrumb{font-family:'Orbitron',monospace;font-size:.68rem;color:var(--glow);}
+.progress-wrap{width:100%;max-width:720px;margin-bottom:.7rem;}
+.progress-track{height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--bright),var(--glow));border-radius:3px;transition:width .4s ease;}
+.progress-lbl{font-size:.68rem;color:var(--muted);margin-top:3px;text-align:right;font-family:'Orbitron',monospace;}
 
-  /* Stars display */
-  .stars-bar { display: flex; align-items: center; gap: 6px; margin-top: 0.8rem; }
-  .star-icon { font-size: 1.2rem; transition: all 0.3s; }
-  .star-icon.earned { color: var(--gold); text-shadow: 0 0 10px rgba(255,217,61,0.6); }
-  .star-icon.empty { color: #334; }
+.ex-card{width:100%;max-width:720px;background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:1.25rem 1.4rem;margin-bottom:.8rem;backdrop-filter:blur(8px);}
+.q-text{font-size:1rem;font-weight:700;color:var(--gold);margin-bottom:1rem;}
 
-  /* ===== EXERCISE PAGE ===== */
-  #page-exercise { padding: 1rem; justify-content: flex-start; min-height: 100vh; }
+/* Choices */
+.choices-grid{display:flex;flex-direction:column;gap:8px;}
+.choice-btn{background:rgba(13,42,92,.7);border:2px solid var(--border);border-radius:10px;padding:.65rem 1rem;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:600;color:var(--snow);cursor:pointer;text-align:left;transition:.18s;}
+.choice-btn:hover:not(:disabled){border-color:var(--glow);background:rgba(77,166,255,.1);}
+.choice-btn.ok{border-color:var(--green)!important;background:rgba(46,204,113,.18)!important;color:var(--green)!important;}
+.choice-btn.ko{border-color:var(--red)!important;background:rgba(255,59,78,.12)!important;color:var(--red)!important;}
 
-  .ex-header {
-    width: 100%; max-width: 680px;
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 1rem;
-    padding: 0.75rem 1rem;
-    background: var(--panel); border-radius: 12px;
-    border: 1px solid var(--panel-border);
-  }
-  .ex-breadcrumb { font-family: 'Orbitron', monospace; font-size: 0.75rem; color: var(--blue-glow); }
-  .ex-stars { display: flex; gap: 4px; }
+/* Fill */
+.fill-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:.8rem;}
+.fill-txt{font-size:.95rem;color:var(--muted);}
+.fill-input{background:rgba(13,42,92,.8);border:2px solid var(--bright);border-radius:8px;padding:.5rem .9rem;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:700;color:var(--gold);outline:none;min-width:110px;max-width:180px;transition:.2s;}
+.fill-input:focus{border-color:var(--gold);box-shadow:0 0 12px rgba(255,217,61,.18);}
+.fill-input.ok{border-color:var(--green);color:var(--green);}
+.fill-input.ko{border-color:var(--red);color:var(--red);}
 
-  .mission-card {
-    width: 100%; max-width: 680px;
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
-    border-radius: 20px;
-    padding: 1.5rem;
-    backdrop-filter: blur(10px);
-    margin-bottom: 1rem;
-  }
-  .mission-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(26,110,245,0.2);
-    border: 1px solid rgba(26,110,245,0.4);
-    border-radius: 50px;
-    padding: 4px 12px;
-    font-family: 'Orbitron', monospace;
-    font-size: 0.65rem;
-    color: var(--blue-glow);
-    letter-spacing: 0.05em;
-    margin-bottom: 1rem;
-  }
-  .mission-story {
-    font-size: 1rem; line-height: 1.7;
-    color: var(--snow);
-    margin-bottom: 1.2rem;
-    padding: 1rem;
-    background: rgba(0,0,0,0.2);
-    border-radius: 10px;
-    border-left: 3px solid var(--blue-glow);
-  }
-  .mission-question {
-    font-size: 1.05rem; font-weight: 700;
-    color: var(--gold);
-    margin-bottom: 1rem;
-  }
+/* Feedback */
+.feedback{width:100%;max-width:720px;padding:.8rem 1.2rem;border-radius:10px;font-size:.95rem;font-weight:700;text-align:center;display:none;margin-bottom:.7rem;animation:fi .3s ease;}
+.feedback.ok{background:rgba(46,204,113,.18);border:1px solid var(--green);color:var(--green);}
+.feedback.ko{background:rgba(255,59,78,.12);border:1px solid var(--red);color:var(--red);}
 
-  /* Exercise types */
-  .choices-grid { display: flex; flex-direction: column; gap: 10px; }
-  .choice-btn {
-    background: rgba(13,42,92,0.7);
-    border: 2px solid var(--panel-border);
-    border-radius: 12px;
-    padding: 0.75rem 1.2rem;
-    font-family: 'Nunito', sans-serif;
-    font-size: 1rem; font-weight: 600;
-    color: var(--snow);
-    cursor: pointer;
-    text-align: left;
-    transition: all 0.2s;
-  }
-  .choice-btn:hover { border-color: var(--blue-glow); background: rgba(77,166,255,0.1); }
-  .choice-btn.correct { border-color: var(--green-ok); background: rgba(46,204,113,0.2); color: var(--green-ok); }
-  .choice-btn.wrong { border-color: var(--red); background: rgba(255,68,85,0.15); color: var(--red); }
-  .choice-btn:disabled { cursor: default; }
+.next-row{width:100%;max-width:720px;display:flex;justify-content:flex-end;}
 
-  .fill-wrap { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-  .fill-input {
-    background: rgba(13,42,92,0.8);
-    border: 2px solid var(--blue-bright);
-    border-radius: 8px;
-    padding: 0.6rem 1rem;
-    font-family: 'Nunito', sans-serif;
-    font-size: 1rem; font-weight: 700;
-    color: var(--gold);
-    outline: none;
-    min-width: 120px;
-    max-width: 200px;
-    transition: all 0.2s;
-  }
-  .fill-input:focus { border-color: var(--gold); box-shadow: 0 0 15px rgba(255,217,61,0.2); }
-  .fill-input.correct { border-color: var(--green-ok); color: var(--green-ok); }
-  .fill-input.wrong { border-color: var(--red); color: var(--red); }
+/* ═══════════════════════════════════════════════
+   MICRO-ICE CONSEIL
+═══════════════════════════════════════════════ */
+.conseil-bubble{display:flex;align-items:flex-start;gap:10px;background:rgba(26,110,245,.1);border:1px solid rgba(26,110,245,.25);border-radius:12px;padding:.8rem 1rem;margin-bottom:1rem;}
+.conseil-avatar{font-size:2rem;flex-shrink:0;}
+.conseil-text{font-size:.85rem;color:#a0c4e8;line-height:1.6;}
+.conseil-text strong{color:var(--glow);}
 
-  /* Lesson box */
-  .lesson-box {
-    background: rgba(139,92,246,0.1);
-    border: 1px solid rgba(139,92,246,0.3);
-    border-radius: 12px;
-    padding: 1rem 1.2rem;
-    margin-bottom: 1rem;
-    font-size: 0.9rem;
-    color: #c4b5fd;
-    line-height: 1.6;
-  }
-  .lesson-box strong { color: #a78bfa; }
+/* ═══════════════════════════════════════════════
+   GAME : RELIER
+═══════════════════════════════════════════════ */
+.relier-container{display:flex;gap:0;position:relative;width:100%;}
+.relier-col{display:flex;flex-direction:column;gap:8px;flex:1;}
+.relier-col.right{align-items:flex-end;}
+.relier-item{background:rgba(13,42,92,.7);border:2px solid var(--border);border-radius:8px;padding:.5rem .9rem;font-size:.92rem;font-weight:700;cursor:pointer;transition:.18s;user-select:none;position:relative;z-index:1;}
+.relier-item:hover{border-color:var(--glow);}
+.relier-item.selected{border-color:var(--gold);background:rgba(255,217,61,.12);color:var(--gold);}
+.relier-item.matched{border-color:var(--green);background:rgba(46,204,113,.15);color:var(--green);pointer-events:none;}
+.relier-item.error-flash{border-color:var(--red);background:rgba(255,59,78,.15);color:var(--red);animation:errflash .5s ease;}
+@keyframes errflash{0%,100%{transform:none;}50%{transform:translateX(4px);}}
+.relier-svg{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:visible;}
 
-  /* Feedback */
-  .feedback-banner {
-    width: 100%; max-width: 680px;
-    padding: 1rem 1.5rem;
-    border-radius: 12px;
-    font-size: 1rem; font-weight: 700;
-    text-align: center;
-    display: none;
-    margin-bottom: 1rem;
-    animation: slide-up 0.3s ease;
-  }
-  @keyframes slide-up { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
-  .feedback-banner.correct { background: rgba(46,204,113,0.2); border: 1px solid var(--green-ok); color: var(--green-ok); }
-  .feedback-banner.wrong { background: rgba(255,68,85,0.15); border: 1px solid var(--red); color: var(--red); }
+/* ═══════════════════════════════════════════════
+   GAME : PUZZLE
+═══════════════════════════════════════════════ */
+.puzzle-grid{display:flex;flex-direction:column;gap:10px;}
+.puzzle-pair{display:flex;gap:8px;align-items:center;}
+.puzzle-piece{background:rgba(13,42,92,.7);border:2px solid var(--border);border-radius:8px;padding:.55rem 1rem;font-size:.95rem;font-weight:700;cursor:pointer;transition:.18s;user-select:none;flex:1;text-align:center;}
+.puzzle-piece:hover{border-color:var(--glow);}
+.puzzle-piece.selected{border-color:var(--gold);background:rgba(255,217,61,.12);color:var(--gold);}
+.puzzle-piece.matched{border-color:var(--green);background:rgba(46,204,113,.15);color:var(--green);pointer-events:none;}
+.puzzle-piece.error-flash{animation:errflash .5s ease;border-color:var(--red);}
+.puzzle-connector{font-size:1.2rem;color:var(--muted);}
 
-  /* ===== VICTORY SPLASH ===== */
-  .victory-splash {
-    display: none; position: fixed; inset: 0; z-index: 100;
-    background: rgba(5,12,26,0.95);
-    flex-direction: column; align-items: center; justify-content: center;
-    text-align: center;
-  }
-  .victory-splash.show { display: flex; }
-  .trophy { font-size: 5rem; animation: trophy-bounce 0.8s ease; }
-  @keyframes trophy-bounce { 0% { transform: scale(0) rotate(-20deg); } 70% { transform: scale(1.2) rotate(5deg); } 100% { transform: scale(1) rotate(0); } }
-  .victory-title { font-family: 'Orbitron', monospace; font-size: 2rem; color: var(--gold); margin: 1rem 0 0.3rem; text-shadow: 0 0 40px rgba(255,217,61,0.6); }
-  .victory-sub { color: var(--text-muted); font-size: 1rem; margin-bottom: 1.5rem; }
-  .confetti-piece {
-    position: fixed; width: 10px; height: 10px;
-    border-radius: 2px; animation: fall 3s linear forwards;
-    pointer-events: none;
-  }
-  @keyframes fall {
-    from { opacity:1; transform: translateY(-50px) rotate(0deg); }
-    to { opacity:0; transform: translateY(110vh) rotate(720deg); }
-  }
+/* ═══════════════════════════════════════════════
+   GAME : CHASSE INFINITIF
+═══════════════════════════════════════════════ */
+.hunt-grid{display:flex;flex-wrap:wrap;gap:8px;}
+.hunt-word{background:rgba(13,42,92,.7);border:2px solid var(--border);border-radius:8px;padding:.45rem .9rem;font-size:.88rem;font-weight:600;cursor:pointer;transition:.18s;}
+.hunt-word:hover{border-color:var(--glow);}
+.hunt-word.found{border-color:var(--green);background:rgba(46,204,113,.15);color:var(--green);pointer-events:none;}
+.hunt-word.error-flash{animation:errflash .4s ease;border-color:var(--red);}
+.hunt-word.dimmed{opacity:.45;}
 
-  /* ===== PROGRESS BAR ===== */
-  .progress-wrap { width: 100%; max-width: 680px; margin-bottom: 1rem; }
-  .progress-track { height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
-  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--blue-bright), var(--blue-glow)); border-radius: 3px; transition: width 0.5s ease; }
-  .progress-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; text-align: right; font-family: 'Orbitron', monospace; }
+/* ═══════════════════════════════════════════════
+   GAME : TIR AU BUT
+═══════════════════════════════════════════════ */
+.foot-field{position:relative;background:linear-gradient(180deg,#0a3d0a 0%,#0d5c10 40%,#0a3d0a 100%);border-radius:12px;overflow:hidden;height:320px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;padding:1rem;border:2px solid rgba(255,255,255,.08);}
+.foot-lines{position:absolute;inset:0;pointer-events:none;}
+.ball-btn{width:80px;height:80px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#ccc);border:2px solid #fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:#222;transition:.2s;position:relative;box-shadow:0 4px 12px rgba(0,0,0,.4);flex-shrink:0;text-align:center;padding:4px;}
+.ball-btn:hover{transform:scale(1.08);box-shadow:0 6px 20px rgba(0,0,0,.5);}
+.ball-btn.shooting{animation:shoot .6s ease forwards;}
+.ball-btn.saved{animation:miss .5s ease forwards;}
+@keyframes shoot{0%{transform:scale(1);}30%{transform:scale(1.2);}100%{transform:translate(0,-150px) scale(.3);opacity:0;}}
+@keyframes miss{0%,100%{transform:none;}25%{transform:rotate(-15deg);}75%{transform:rotate(15deg);}}
+.goal-post{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:120px;height:50px;border:4px solid #fff;border-bottom:none;border-radius:4px 4px 0 0;pointer-events:none;}
+.field-result{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;opacity:0;pointer-events:none;transition:.3s;}
 
-  /* ===== END SCREEN ===== */
-  #page-end { text-align: center; }
-  .cup-img { font-size: 6rem; animation: float 3s ease-in-out infinite; }
-  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-  .end-title { font-family: 'Orbitron', monospace; font-size: 2.5rem; color: var(--gold); text-shadow: 0 0 40px rgba(255,217,61,0.5); margin: 1rem 0 0.5rem; }
-  .end-score { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 2rem; }
-  .end-score span { color: var(--gold); font-weight: 700; font-size: 1.5rem; }
+/* ═══════════════════════════════════════════════
+   GAME : TEXTE CLIQUABLE
+═══════════════════════════════════════════════ */
+.click-text{font-size:1rem;line-height:2.2;color:var(--snow);}
+.clickable-word{cursor:pointer;padding:2px 4px;border-radius:4px;border-bottom:2px solid rgba(77,166,255,.35);transition:.15s;display:inline;}
+.clickable-word:hover{background:rgba(77,166,255,.1);border-color:var(--glow);}
+.clickable-word.found-pp{background:rgba(46,204,113,.2);border-color:var(--green);color:var(--green);}
+.clickable-word.wrong-click{background:rgba(255,59,78,.15);border-color:var(--red);animation:errflash .4s ease;}
+.click-hint{font-size:.75rem;color:var(--muted);margin-top:.5rem;}
 
-  /* ===== RESPONSIVE ===== */
-  @media (max-width: 500px) {
-    .cell { width: 65px; height: 65px; }
-    .cell-icon { font-size: 1.1rem; }
-    .logo-gf { font-size: 1.8rem; }
-  }
+/* ═══════════════════════════════════════════════
+   GAME : VITESSE ÊTRE/AVOIR
+═══════════════════════════════════════════════ */
+.speed-arena{display:flex;flex-direction:column;align-items:center;gap:1.2rem;}
+.speed-verb{font-family:'Orbitron',monospace;font-size:1.6rem;font-weight:700;color:var(--gold);text-align:center;min-height:2.5rem;transition:.2s;}
+.speed-btns{display:flex;gap:1rem;}
+.speed-btn{width:130px;padding:.9rem;font-family:'Orbitron',monospace;font-size:.9rem;font-weight:700;border-radius:12px;border:3px solid var(--border);background:rgba(13,42,92,.7);color:var(--snow);cursor:pointer;transition:.2s;text-align:center;}
+.speed-btn:hover{transform:scale(1.05);}
+.speed-btn.etre:hover{border-color:#8b5cf6;background:rgba(139,92,246,.2);}
+.speed-btn.avoir:hover{border-color:var(--bright);background:rgba(26,110,245,.2);}
+.speed-btn.correct-flash{border-color:var(--green);background:rgba(46,204,113,.2);}
+.speed-btn.wrong-flash{border-color:var(--red);background:rgba(255,59,78,.15);}
+.speed-timer{width:200px;height:8px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;}
+.speed-timer-fill{height:100%;border-radius:4px;transition:width .1s linear;background:linear-gradient(90deg,var(--green),var(--gold));}
+.speed-score{font-family:'Orbitron',monospace;font-size:1rem;color:var(--muted);}
 
-  /* ===== Animations d'entrée ===== */
-  .fade-in { animation: fadeIn 0.6s ease forwards; }
-  @keyframes fadeIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+/* ═══════════════════════════════════════════════
+   GAME : BOÎTES ÊTRE/AVOIR
+═══════════════════════════════════════════════ */
+.boxes-area{display:flex;flex-direction:column;gap:1rem;}
+.verbs-pool{display:flex;flex-wrap:wrap;gap:8px;min-height:48px;}
+.verb-chip{background:rgba(13,42,92,.8);border:2px solid var(--border);border-radius:8px;padding:.4rem .9rem;font-size:.9rem;font-weight:700;cursor:grab;transition:.18s;user-select:none;}
+.verb-chip:hover{border-color:var(--gold);background:rgba(255,217,61,.1);}
+.verb-chip.dragging{opacity:.5;border-color:var(--gold);}
+.boxes-row{display:flex;gap:14px;}
+.drop-box{flex:1;min-height:120px;border-radius:12px;border:2px dashed var(--border);padding:.8rem;display:flex;flex-direction:column;gap:6px;transition:.2s;}
+.drop-box.drag-over{border-color:var(--gold);background:rgba(255,217,61,.06);}
+.drop-box h4{font-family:'Orbitron',monospace;font-size:.75rem;text-align:center;margin-bottom:4px;}
+.drop-box.etre-box h4{color:#a78bfa;}
+.drop-box.avoir-box h4{color:var(--glow);}
+.dropped-chip{border-radius:8px;padding:.35rem .75rem;font-size:.85rem;font-weight:700;display:inline-block;}
+.dropped-chip.correct{background:rgba(46,204,113,.2);border:1px solid var(--green);color:var(--green);}
+.dropped-chip.incorrect{background:rgba(255,59,78,.15);border:1px solid var(--red);color:var(--red);}
 
-  /* Type QCM drag & match */
-  .match-pairs { display: flex; gap: 20px; flex-wrap: wrap; }
-  .match-col { flex: 1; min-width: 140px; display: flex; flex-direction: column; gap: 8px; }
-  .match-col h4 { font-family: 'Orbitron', monospace; font-size: 0.7rem; color: var(--blue-glow); margin-bottom: 4px; }
-  .match-item {
-    background: rgba(13,42,92,0.7); border: 2px solid var(--panel-border);
-    border-radius: 10px; padding: 0.5rem 0.8rem;
-    font-size: 0.9rem; cursor: pointer;
-    transition: all 0.2s; text-align: center;
-    font-weight: 600;
-  }
-  .match-item:hover { border-color: var(--blue-glow); }
-  .match-item.selected { border-color: var(--gold); background: rgba(255,217,61,0.1); color: var(--gold); }
-  .match-item.matched { border-color: var(--green-ok); background: rgba(46,204,113,0.15); color: var(--green-ok); pointer-events: none; }
-  .match-item.error { border-color: var(--red); background: rgba(255,68,85,0.15); color: var(--red); }
+/* ═══════════════════════════════════════════════
+   GAME : LETTRE DE MEÏ
+═══════════════════════════════════════════════ */
+.letter-wrap{background:rgba(255,255,255,.04);border-radius:12px;padding:1.2rem;font-size:.95rem;line-height:2.1;color:var(--snow);}
+.letter-blank{display:inline-block;min-width:90px;border-bottom:2px solid var(--glow);text-align:center;vertical-align:bottom;cursor:text;padding:0 4px;color:var(--gold);font-weight:700;font-size:.9rem;min-height:22px;transition:.2s;}
+.letter-blank:focus,.letter-blank.editing{outline:none;border-color:var(--gold);background:rgba(255,217,61,.07);}
+.letter-blank.ok{border-color:var(--green);color:var(--green);}
+.letter-blank.ko{border-color:var(--red);color:var(--red);}
+.letter-blank input{background:transparent;border:none;outline:none;width:100%;color:inherit;font:inherit;text-align:center;}
 
-  .inline-blank {
-    display: inline-block;
-    min-width: 80px; height: 30px;
-    border-bottom: 2px solid var(--blue-glow);
-    color: var(--gold); font-weight: 700;
-    text-align: center; vertical-align: bottom;
-    line-height: 30px; padding: 0 4px;
-  }
+/* ═══════════════════════════════════════════════
+   VICTORY / END
+═══════════════════════════════════════════════ */
+#victory-overlay{position:fixed;inset:0;z-index:300;background:rgba(2,8,20,.97);display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:.8rem;}
+#victory-overlay.show{display:flex;animation:fi .4s ease;}
+.v-trophy{font-size:4.5rem;animation:tb .7s ease;}
+@keyframes tb{0%{transform:scale(0) rotate(-15deg);}70%{transform:scale(1.15) rotate(4deg);}100%{transform:scale(1) rotate(0);}}
+.v-title{font-family:'Orbitron',monospace;font-size:2rem;color:var(--gold);text-shadow:0 0 30px rgba(255,217,61,.5);}
+.v-sub{color:var(--muted);font-size:.95rem;}
+.v-stars{display:flex;gap:.5rem;justify-content:center;font-size:2rem;}
+.confetti{position:fixed;width:9px;height:9px;border-radius:2px;animation:cf 3s linear forwards;pointer-events:none;z-index:400;}
+@keyframes cf{from{opacity:1;transform:translateY(-60px) rotate(0);}to{opacity:0;transform:translateY(110vh) rotate(720deg);}}
+
+#page-end{text-align:center;padding:2rem 1rem;}
+.end-cup{font-size:5rem;animation:float 3s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-14px);}}
+.end-title{font-family:'Orbitron',monospace;font-size:2.2rem;color:var(--gold);text-shadow:0 0 40px rgba(255,217,61,.45);margin:.8rem 0 .4rem;}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════ */
+@media(max-width:500px){
+  .mission-cell{width:74px;height:74px;}
+  .ball-btn{width:68px;height:68px;font-size:.58rem;}
+  .speed-btn{width:110px;}
+  .relier-item{font-size:.8rem;padding:.45rem .7rem;}
+}
 </style>
 </head>
 <body>
-
-<!-- Starfield -->
 <div id="starfield"></div>
 
-<!-- ===== PAGE INTRO ===== -->
-<div class="page active" id="page-intro">
-  <div class="fade-in" style="text-align:center; max-width:680px; width:100%;">
-    <div style="font-size:3rem; margin-bottom:0.5rem;">⚽🌌</div>
-    <div class="logo-gf">GALACTIK FOOTBALL</div>
-    <div class="subtitle-intro">Mission Conjugaison</div>
+<!-- ══════════════════════ VIDEO MODAL ══════════════════════ -->
+<div id="video-modal">
+  <div class="video-placeholder" id="video-placeholder">
+    <div style="font-size:3rem;">🎬</div>
+    <div style="font-family:'Orbitron',monospace;color:var(--glow);font-size:.9rem;letter-spacing:.1em;">INTRO.MP4</div>
+    <div style="color:var(--muted);font-size:.85rem;max-width:340px;text-align:center;">Place le fichier <strong>intro.mp4</strong> dans le même dossier que index.html pour afficher la vidéo ici.</div>
+  </div>
+  <video id="intro-video" style="display:none;" controls>
+    <source src="intro.mp4" type="video/mp4">
+  </video>
+  <button class="btn btn-gold" onclick="closeIntroVideo()">Entrer dans l'équipe ⚡</button>
+</div>
 
-    <div class="story-box">
-      <p>Dans une galaxie lointaine, les Snow Kids — la légendaire équipe de la planète Akillian — ont besoin d'un <span class="highlight-name">nouveau joueur</span> pour remporter la <span class="highlight-name">Galactik Football Cup</span> !</p>
-      <p>Leur entraîneur <span class="highlight-name">Aarch</span> a lancé un appel dans toute la galaxie : il cherche quelqu'un de courageux, intelligent… et qui maîtrise le Souffle de la conjugaison ! 🌬️</p>
-      <p>Ce joueur extraordinaire, c'est peut-être <strong>toi</strong> !</p>
+<!-- ══════════════════════ PAGE 1 : ACCUEIL ══════════════════════ -->
+<div class="page active" id="page-home">
+  <div class="fade-in" style="text-align:center;max-width:660px;width:100%;">
+
+    <div id="home-imgs" style="display:flex;justify-content:center;gap:10px;margin-bottom:1rem;flex-wrap:wrap;"></div>
+
+    <div class="logo">GALACTIK FOOTBALL</div>
+    <div class="sub-logo">Mission Conjugaison</div>
+
+    <div class="card" style="margin:0 0 1.5rem;text-align:left;">
+      <p style="font-size:.95rem;line-height:1.75;color:var(--snow);">
+        Dans une galaxie lointaine, les <span class="char-name">Snow Kids</span> — l'équipe légendaire de la planète <span class="char-name">Akillian</span> — recherchent un nouveau joueur pour remporter la <span class="char-name">Galactik Football Cup</span> !<br><br>
+        Leur entraîneur <span class="char-name">Aarch</span> a lancé un appel dans toute la galaxie : il cherche quelqu'un de courageux, intelligent… et qui maîtrise le <span class="char-name">Souffle de la conjugaison</span> 🌬️<br><br>
+        Ce joueur extraordinaire, c'est peut-être <strong>toi</strong> !
+      </p>
     </div>
 
-    <div class="name-input-wrap">
-      <label>✦ Quel est ton prénom, futur Snow Kid ?</label>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:.6rem;margin-bottom:1.5rem;">
+      <label style="font-family:'Orbitron',monospace;font-size:.72rem;color:var(--glow);letter-spacing:.1em;">✦ Quel est ton prénom, futur Snow Kid ?</label>
       <input class="name-input" id="player-name" type="text" placeholder="Ton prénom" maxlength="16" autocomplete="off" />
     </div>
 
-    <button class="btn btn-gold" onclick="startGame()">Rejoindre les Snow Kids ⚡</button>
+    <button class="btn btn-gold" onclick="launchIntro()">Rejoindre les Snow Kids ⚡</button>
   </div>
 </div>
 
-<!-- ===== PAGE MAP ===== -->
-<div class="page" id="page-map">
-  <div class="map-header fade-in">
-    <h2>🗺️ Plateau de Mission</h2>
-    <p id="map-subtitle">Bienvenue, <span id="map-name-display"></span> ! Clique sur ta prochaine mission.</p>
-    <div class="stars-bar" style="justify-content:center; margin-top:0.5rem;">
-      <span style="font-size:0.8rem; color:var(--text-muted); margin-right:4px; font-family:'Orbitron',monospace;">ÉTOILES :</span>
-      <span class="star-icon" id="gs1">⭐</span>
-      <span class="star-icon" id="gs2">⭐</span>
-      <span class="star-icon" id="gs3">⭐</span>
-      <span class="star-icon" id="gs4">⭐</span>
-      <span class="star-icon" id="gs5">⭐</span>
-      <span class="star-icon" id="gs6">⭐</span>
-      <span class="star-icon" id="gs7">⭐</span>
-      <span class="star-icon" id="gs8">⭐</span>
-      <span class="star-icon" id="gs9">⭐</span>
-      <span class="star-icon" id="gs10">⭐</span>
+<!-- ══════════════════════ PAGE 2 : ÉQUIPE ══════════════════════ -->
+<div class="page" id="page-team">
+  <div class="fade-in" style="text-align:center;width:100%;max-width:780px;">
+    <div style="font-family:'Orbitron',monospace;font-size:.8rem;color:var(--glow);letter-spacing:.15em;margin-bottom:.3rem;">TON ÉQUIPE</div>
+    <h2 style="font-family:'Orbitron',monospace;font-size:1.5rem;color:var(--gold);margin-bottom:.3rem;">Les Snow Kids t'accueillent !</h2>
+    <p style="color:var(--muted);font-size:.9rem;margin-bottom:1rem;">Tu fais maintenant partie de la meilleure équipe de la galaxie.</p>
+
+    <div class="team-grid" id="team-grid"></div>
+
+    <div class="conseil-bubble" style="max-width:480px;margin:.8rem auto 1.5rem;">
+      <div class="conseil-avatar">❄️</div>
+      <div class="conseil-text"><strong>Micro-Ice :</strong> "Bienvenue dans l'équipe, <span id="team-name-display"></span> ! Pour maîtriser le Souffle, il va falloir s'entraîner dur. La conjugaison, c'est notre arme secrète !"</div>
     </div>
-  </div>
-  <div class="board-container">
-    <div class="board-track" id="board-track"></div>
+
+    <button class="btn btn-gold" onclick="goToMissions()">Commencer l'entraînement →</button>
   </div>
 </div>
 
-<!-- ===== PAGE EXERCISE ===== -->
-<div class="page" id="page-exercise">
-  <div class="ex-header fade-in">
-    <div class="ex-breadcrumb" id="ex-breadcrumb">Mission 1</div>
-    <div class="ex-stars" id="ex-stars-display"></div>
-    <button class="btn btn-ghost btn-sm" onclick="showMap()">← Carte</button>
+<!-- ══════════════════════ PAGE 3 : MISSIONS ══════════════════════ -->
+<div class="page" id="page-missions">
+  <div class="missions-header fade-in">
+    <h1>Missions</h1>
+    <p>Entraîne-toi pour maîtriser le Souffle du passé composé. Complète chaque mission pour débloquer la suivante !</p>
+    <div class="global-stars-bar" style="justify-content:center;" id="global-stars-bar"></div>
+  </div>
+  <div id="missions-board" style="width:100%;max-width:760px;"></div>
+  <div style="height:2rem;"></div>
+</div>
+
+<!-- ══════════════════════ PAGE 4 : EXERCICE ══════════════════════ -->
+<div class="page" id="page-ex">
+  <div class="ex-top fade-in">
+    <div class="ex-breadcrumb" id="ex-bc"></div>
+    <button class="btn btn-ghost btn-sm" onclick="goToMissions()">← Missions</button>
   </div>
   <div class="progress-wrap">
-    <div class="progress-track"><div class="progress-fill" id="ex-progress-fill" style="width:0%"></div></div>
-    <div class="progress-label" id="ex-progress-label">0 / 0</div>
+    <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="progress-lbl" id="prog-lbl">0 / 0</div>
   </div>
-  <div id="exercise-area" style="width:100%; max-width:680px;"></div>
-  <div class="feedback-banner" id="feedback-banner"></div>
-  <div style="width:100%; max-width:680px; display:flex; justify-content:flex-end; margin-top:0.5rem;">
-    <button class="btn btn-blue" id="btn-next" onclick="nextQuestion()" style="display:none;">Suite →</button>
-  </div>
+  <div id="ex-content" style="width:100%;max-width:720px;"></div>
+  <div class="feedback" id="feedback"></div>
+  <div class="next-row"><button class="btn btn-blue" id="btn-next" onclick="nextStep()" style="display:none;">Suite →</button></div>
 </div>
 
-<!-- ===== PAGE FIN ===== -->
+<!-- ══════════════════════ PAGE FIN ══════════════════════ -->
 <div class="page" id="page-end">
-  <div class="fade-in" style="text-align:center; max-width:560px;">
-    <div class="cup-img">🏆</div>
+  <div class="fade-in" style="text-align:center;max-width:540px;">
+    <div class="end-cup">🏆</div>
     <div class="end-title">GALACTIK CHAMPION !</div>
-    <div class="end-score" id="end-score-text"></div>
-    <div class="story-box" id="end-story"></div>
+    <p style="color:var(--muted);font-size:.95rem;margin:.5rem 0 1.5rem;" id="end-score"></p>
+    <div class="card" id="end-story" style="text-align:left;"></div>
     <button class="btn btn-gold" onclick="replayGame()" style="margin-top:1.5rem;">Rejouer 🌌</button>
   </div>
 </div>
 
-<!-- Victory splash -->
-<div class="victory-splash" id="victory-splash">
-  <div class="trophy">🏅</div>
-  <div class="victory-title" id="victory-title">Mission accomplie !</div>
-  <div class="victory-sub" id="victory-sub"></div>
-  <div class="stars-bar" style="justify-content:center; margin-bottom:1.5rem;" id="victory-stars"></div>
-  <button class="btn btn-gold" onclick="closeVictory()">Continuer →</button>
+<!-- ══════════════════════ VICTORY OVERLAY ══════════════════════ -->
+<div id="victory-overlay">
+  <div class="v-trophy" id="v-trophy">🏅</div>
+  <div class="v-title" id="v-title"></div>
+  <div class="v-sub" id="v-sub"></div>
+  <div class="v-stars" id="v-stars"></div>
+  <button class="btn btn-gold" onclick="closeVictory()" style="margin-top:.5rem;">Continuer →</button>
 </div>
 
 <script>
-// ============================================================
-//  STARFIELD
-// ============================================================
-(function(){
-  const sf = document.getElementById('starfield');
-  for(let i=0;i<120;i++){
-    const s = document.createElement('div');
-    s.className='star';
-    const sz = Math.random()*2.5+0.5;
-    s.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*4}s;animation-duration:${2+Math.random()*3}s;`;
-    sf.appendChild(s);
+/* ═══════════════════════════════════════════════════════════════
+   STARFIELD
+═══════════════════════════════════════════════════════════════ */
+(()=>{const sf=document.getElementById('starfield');for(let i=0;i<130;i++){const s=document.createElement('div');s.className='star';const z=Math.random()*2.5+.4;s.style.cssText=`width:${z}px;height:${z}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*5}s;animation-duration:${2+Math.random()*3}s;`;sf.appendChild(s);}})();
+
+/* ═══════════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════════ */
+let G = {
+  name: '',
+  missionStars: [],   // stars per mission index
+  currentMission: 0,  // index in MISSIONS array
+  currentStep: 0,     // step inside current mission
+  tempCorrect: 0,     // correct answers in current mission
+  totalSteps: 0,
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   PLAYERS DATA
+═══════════════════════════════════════════════════════════════ */
+const PLAYERS = [
+  {id:'djok',    name:"D'Jok",    role:"Attaquant / Capitaine", emoji:'⚽'},
+  {id:'tia',     name:"Tia",      role:"Milieu / Co-capitaine", emoji:'🌟'},
+  {id:'microice',name:"Micro-Ice",role:"Attaquant",              emoji:'❄️'},
+  {id:'rocket',  name:"Rocket",   role:"Milieu de terrain",      emoji:'🚀'},
+  {id:'ahito',   name:"Ahito",    role:"Gardien de but",         emoji:'🧤'},
+  {id:'thran',   name:"Thran",    role:"Défenseur",              emoji:'🛡️'},
+  {id:'mei',     name:"Meï",      role:"Défenseuse",             emoji:'💙'},
+  {id:'aarch',   name:"Aarch",    role:"Coach",                  emoji:'📋'},
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   MISSIONS DATA
+═══════════════════════════════════════════════════════════════ */
+function buildMissions(name){
+return [
+
+/* ══════ OBJECTIF 1 : Infinitif → Participe passé ══════ */
+{
+  obj:1, id:'1a',
+  title:"Leçon : le participe passé",
+  icon:'📚', badge:'AKILLIAN • LEÇON',
+  steps:[{type:'lesson_then_qcm',
+    conseil:{avatar:'❄️', speaker:'Micro-Ice', text:`"${name}, écoute bien ! Les verbes du <strong>1er groupe</strong> (infinitif en <strong>-ER</strong>) ont un participe passé en <strong>-É</strong>. C'est simple comme le Souffle !"` },
+    lesson:`Les verbes en <strong>-ER</strong> → participe passé en <strong>-É</strong><br>
+    <em>marquer → marqu<strong>é</strong> &nbsp;|&nbsp; tirer → tir<strong>é</strong> &nbsp;|&nbsp; passer → pass<strong>é</strong></em>`,
+    story:`${name} pose ses affaires dans le vestiaire des Snow Kids. Aarch entre et dit : "Avant d'entrer sur le terrain, il faut maîtriser les bases !"`,
+    q:"Quel est le participe passé de « marquer » ?",
+    choices:["marqué","marquit","marquis","marquer"], answer:0,
+    feedback:"Bravo ! marquer → marqué. Les verbes en -ER finissent toujours en -É !"
+  }]
+},{
+  obj:1, id:'1b',
+  title:"Relier : infinitifs et participes",
+  icon:'🔗', badge:'AKILLIAN • ENTRAÎNEMENT',
+  steps:[
+    {type:'relier',
+      story:`D'Jok dispose des cartes sur le tableau. "Relie chaque infinitif à son participe passé, ${name} !"`,
+      conseil:{avatar:'❄️', speaker:'Micro-Ice', text:`"Souviens-toi : les verbes en <strong>-ER</strong> donnent <strong>-É</strong>. Facile !"` },
+      pairs:[
+        {left:'tirer',   right:'tiré'},
+        {left:'dribbler',right:'dribblé'},
+        {left:'passer',  right:'passé'},
+        {left:'marquer', right:'marqué'},
+      ]
+    },
+    {type:'relier',
+      story:`Aarch sourit. "Très bien ! Maintenant avec des verbes plus longs."`,
+      pairs:[
+        {left:'entraîner',  right:'entraîné'},
+        {left:'traverser',  right:'traversé'},
+        {left:'accélérer',  right:'accéléré'},
+        {left:'récupérer',  right:'récupéré'},
+      ]
+    }
+  ]
+},{
+  obj:1, id:'1c',
+  title:"Puzzle : assemble les paires",
+  icon:'🧩', badge:'AKILLIAN • PUZZLE',
+  steps:[
+    {type:'puzzle',
+      story:`Clamp projette un hologramme. "Il faut assembler chaque infinitif avec son participe passé !"`,
+      conseil:{avatar:'❄️', speaker:'Micro-Ice', text:`"Clique sur deux pièces qui vont ensemble. L'infinitif d'abord, puis le participe !"` },
+      pairs:[
+        {left:'jouer',   right:'joué'},
+        {left:'gagner',  right:'gagné'},
+        {left:'tirer',   right:'tiré'},
+        {left:'bloquer', right:'bloqué'},
+        {left:'entrer',  right:'entré'},
+        {left:'passer',  right:'passé'},
+      ]
+    }
+  ]
+},{
+  obj:1, id:'1d',
+  title:"Chasse à l'infinitif !",
+  icon:'🔍', badge:'AKILLIAN • CHASSE',
+  steps:[
+    {type:'hunt',
+      story:`Aarch agite une fiche. "J'ai caché des verbes dans une liste ! Trouve tous les <strong>infinitifs en -ER</strong> qui correspondent à un participe passé que je te donne."`,
+      conseil:{avatar:'❄️', speaker:'Micro-Ice', text:`"Cherche bien, ils sont mélangés avec d'autres mots. Affûte ton œil !"` },
+      target_pp:'tiré',
+      target_label:'Trouve l\'infinitif de « tiré »',
+      words:['tirer','jouait','finir','marquer','avait','tirant','venir','courir','tirions','passer','sortir','apporter','tiré','aller','prendre'],
+      answer:'tirer',
+      feedback:'Oui ! "tirer" est bien l\'infinitif de "tiré" ⚽'
+    },
+    {type:'hunt',
+      target_pp:'marqué',
+      target_label:'Trouve l\'infinitif de « marqué »',
+      words:['jouait','marquer','finir','avoir','marchions','vouloir','apporter','marquant','allait','courir','marquerait','passer','rester','sortir','aller'],
+      answer:'marquer',
+      feedback:'"marquer" → participe passé → "marqué" ! 🌟'
+    },
+    {type:'hunt',
+      target_pp:'entraîné',
+      target_label:'Trouve l\'infinitif de « entraîné »',
+      words:['sortir','entraîner','finir','avoir','entraînait','être','passer','courir','rester','apporter','vouloir','entraînons','aller','prendre','venir'],
+      answer:'entraîner',
+      feedback:'Parfait ! entraîner → entraîné 🌬️'
+    }
+  ]
+},{
+  obj:1, id:'1e',
+  title:"Participes irréguliers",
+  icon:'⚠️', badge:'AKILLIAN • ATTENTION',
+  steps:[
+    {type:'lesson_then_qcm',
+      conseil:{avatar:'❄️', speaker:'Micro-Ice', text:`"Attention ! Certains verbes ne suivent pas la règle en <strong>-É</strong>. Ils sont irréguliers ! Il faut les apprendre."` },
+      lesson:`D'autres groupes : participe passé en <strong>-i, -is, -it, -t</strong> ou <strong>-u</strong><br>
+      finir → fin<strong>i</strong> &nbsp;|&nbsp; prendre → pr<strong>is</strong> &nbsp;|&nbsp; avoir → e<strong>u</strong> &nbsp;|&nbsp; être → ét<strong>é</strong><br>
+      <em>Astuce : pense au féminin ! <u>pris</u> → pr<u>ise</u>, donc -is ✓</em>`,
+      story:`Sinedd ricane en passant. "Les verbes irréguliers, voilà votre point faible !" Aarch rétorque : "Pas si ${name} s'entraîne !"`,
+      q:"Quel est le participe passé de « finir » ?",
+      choices:["finé","finis","fini","finait"], answer:2,
+      feedback:"finir → fini ! Verbe du 2e groupe, participe en -i ✅"
+    },
+    {type:'qcm',
+      q:"Quel est le participe passé de « prendre » ?",
+      choices:["prendé","pris","prenu","prend"], answer:1,
+      feedback:"prendre → pris ! Pense au féminin : prise → donc -is ✅"
+    },
+    {type:'qcm',
+      q:"Quel est le participe passé de « avoir » ?",
+      choices:["avoiré","avi","eu","avé"], answer:2,
+      feedback:"avoir → eu ! Verbe irrégulier à retenir ⭐"
+    },
+    {type:'qcm',
+      q:"Quel est le participe passé de « être » ?",
+      choices:["éti","étit","étu","été"], answer:3,
+      feedback:"être → été ! Les deux verbes les plus importants : avoir → eu, être → été 🌟"
+    }
+  ]
+},{
+  obj:1, id:'1f',
+  title:"Puzzle irréguliers",
+  icon:'🧩', badge:'MATCH • DEMI-FINALE',
+  steps:[
+    {type:'puzzle',
+      story:`Les Shadows approchent. Aarch crie : "Pas le temps de fléchir ! Assemble ces paires, vite !"`,
+      conseil:{avatar:'❄️', speaker:'Micro-Ice', text:`"Attention, ce sont les verbes irréguliers ! Fais confiance à ta mémoire !"` },
+      pairs:[
+        {left:'finir',   right:'fini'},
+        {left:'prendre', right:'pris'},
+        {left:'avoir',   right:'eu'},
+        {left:'être',    right:'été'},
+        {left:'courir',  right:'couru'},
+        {left:'venir',   right:'venu'},
+      ]
+    }
+  ]
+},{
+  obj:1, id:'1g',
+  title:"Mix : réguliers et irréguliers",
+  icon:'⚡', badge:'AKILLIAN • RÉVISION',
+  steps:[
+    {type:'relier',
+      story:`Clamp affiche un tableau de révision. "Maintenant on mélange tout. Tu es prêt(e), ${name} ?"`,
+      pairs:[
+        {left:'jouer',   right:'joué'},
+        {left:'finir',   right:'fini'},
+        {left:'tirer',   right:'tiré'},
+        {left:'prendre', right:'pris'},
+        {left:'gagner',  right:'gagné'},
+        {left:'être',    right:'été'},
+      ]
+    }
+  ]
+},
+
+/* ══════ OBJECTIF 2 : Repérer le passé composé ══════ */
+{
+  obj:2, id:'2a',
+  title:"Leçon : le passé composé",
+  icon:'📚', badge:'STADIUM • LEÇON',
+  steps:[{type:'lesson_then_qcm',
+    conseil:{avatar:'❄️', speaker:'Micro-Ice', text:`"Le passé composé c'est facile à reconnaître : il y a <strong>deux mots</strong> — un auxiliaire (avoir ou être) + le participe passé !"` },
+    lesson:`<strong>Passé composé</strong> = auxiliaire conjugué + participe passé<br>
+    ✅ <em>il <strong>a</strong> tiré</em> &nbsp;|&nbsp; ✅ <em>elle <strong>est</strong> arrivée</em><br>
+    ❌ <em>il tire</em> (présent) &nbsp;|&nbsp; ❌ <em>il tirait</em> (imparfait) &nbsp;|&nbsp; ❌ <em>il tirera</em> (futur)`,
+    story:`Le stade galactique s'illumine. La speakeuse annonce le match. "Les Snow Kids entrent sur le terrain !"`,
+    q:"Laquelle est au passé composé ?",
+    choices:["D'Jok tire fort.","D'Jok a tiré fort.","D'Jok tirait fort.","D'Jok tirera."], answer:1,
+    feedback:"'a tiré' = auxiliaire avoir + participe passé → passé composé ! ✅"
+  }]
+},{
+  obj:2, id:'2b',
+  title:"Tir au but : passe ou pas ?",
+  icon:'⚽', badge:'WAMBAS • TIR AU BUT',
+  steps:[
+    {type:'tirbut',
+      story:`C'est le moment du tir au but ! <strong>Clique sur les ballons au passé composé</strong> pour marquer. Si c'est un autre temps, le tir sera raté !`,
+      conseil:{avatar:'❄️', speaker:'Micro-Ice', text:`"Cherche deux mots : l'auxiliaire + le participe passé. Si tu vois ça → TIRE ! Sinon → laisse passer !"` },
+      balls:[
+        {text:"il a couru",          isPC:true},
+        {text:"elle tirait",         isPC:false},
+        {text:"nous avons gagné",    isPC:true},
+        {text:"il marquera",         isPC:false},
+        {text:"tu as dribblé",       isPC:true},
+        {text:"elles jouent",        isPC:false},
+      ]
+    },
+    {type:'tirbut',
+      story:`Deuxième série de tirs ! Les Wambas n'ont pas dit leur dernier mot !`,
+      balls:[
+        {text:"j'ai passé",          isPC:true},
+        {text:"il court",            isPC:false},
+        {text:"ils ont bloqué",      isPC:true},
+        {text:"vous étiez",          isPC:false},
+        {text:"elle est arrivée",    isPC:true},
+        {text:"tu partiras",         isPC:false},
+      ]
+    }
+  ]
+},{
+  obj:2, id:'2c',
+  title:"Texte cliquable",
+  icon:'📖', badge:'VESTIAIRE • ANALYSE',
+  steps:[
+    {type:'clicktext',
+      story:`Après le match, Clamp analyse le jeu. Lis ce compte-rendu et <strong>clique sur tous les verbes au passé composé</strong>.`,
+      conseil:{avatar:'❄️', speaker:'Micro-Ice', text:`"Clique sur chaque verbe au passé composé. Si tu te trompes ce n'est pas grave, tu verras quel temps c'est !"` },
+      text_parts:[
+        {word:"Les Snow Kids",clk:false},{word:" ",clk:false},
+        {word:"ont",clk:false,group:'ont joué',gid:0},{word:" ",clk:false},
+        {word:"joué",clk:false,group:'ont joué',gid:0,pp:true,pp_whole:true},
+        {word:" un super match. D'Jok ",clk:false},
+        {word:"a",clk:false,group:'a tiré',gid:1},{word:" ",clk:false},
+        {word:"tiré",clk:false,group:'a tiré',gid:1,pp:true,pp_whole:true},
+        {word:" trois fois. Ahito ",clk:false},
+        {word:"arrêtait",clk:true,tense:"imparfait"},
+        {word:" tous les tirs. Tia ",clk:false},
+        {word:"a",clk:false,group:'a passé',gid:2},{word:" ",clk:false},
+        {word:"passé",clk:false,group:'a passé',gid:2,pp:true,pp_whole:true},
+        {word:" le ballon à Rocket qui ",clk:false},
+        {word:"courait",clk:true,tense:"imparfait"},
+        {word:" très vite. Les Wambas ",clk:false},
+        {word:"ont",clk:false,group:'ont perdu',gid:3},{word:" ",clk:false},
+        {word:"perdu",clk:false,group:'ont perdu',gid:3,pp:true,pp_whole:true},
+        {word:".",clk:false}
+      ],
+      pp_ids:[0,1,2,3]
+    }
+  ]
+},{
+  obj:2, id:'2d',
+  title:"Tir au but — Niveau 2",
+  icon:'⚽', badge:'LIGHTNINGS • TIR AU BUT',
+  steps:[
+    {type:'tirbut',
+      story:`Les Lightnings arrivent ! Ils ont des éclairs dans les jambes. Concentre-toi sur les passés composés !`,
+      conseil:{avatar:'❄️', speaker:'Micro-Ice', text:`"Niveau 2 ! Plus de ballons, moins de temps pour réfléchir. Fais confiance à ton Souffle !"` },
+      balls:[
+        {text:"Rocket a marqué",      isPC:true},
+        {text:"Meï défendait",        isPC:false},
+        {text:"ils ont filé",         isPC:true},
+        {text:"tu dribbles",          isPC:false},
+        {text:"elle est tombée",      isPC:true},
+        {text:"nous courions",        isPC:false},
+        {text:"j'ai lancé",           isPC:true},
+        {text:"il sautera",           isPC:false},
+      ]
+    }
+  ]
+},{
+  obj:2, id:'2e',
+  title:"Reconnaître parmi des phrases",
+  icon:'🎯', badge:'CUP • REPÉRAGE',
+  steps:[
+    {type:'qcm',
+      story:`Aarch teste ${name} avec des phrases de match.`,
+      q:"Quelle phrase est au passé composé ?",
+      choices:["Ahito saute très haut.","Ahito sautera très haut.","Ahito a sauté très haut.","Ahito sautait très haut."], answer:2,
+      feedback:"'a sauté' → auxiliaire avoir + participe passé → passé composé ✅"
+    },
+    {type:'qcm',
+      q:"Laquelle N'est PAS au passé composé ?",
+      choices:["Micro-Ice a dribblé.","Tia a passé.","Rocket courait vite.","D'Jok a marqué."], answer:2,
+      feedback:"'courait' est à l'imparfait (-ait). Pas de passé composé ici !"
+    },
+    {type:'qcm',
+      q:"Quelle phrase est au passé composé ?",
+      choices:["Les Snow Kids gagnaient.","Les Snow Kids ont gagné !","Les Snow Kids gagnent !","Les Snow Kids gagneront."], answer:1,
+      feedback:"'ont gagné' → passé composé ! VICTOIRE ! 🏆"
+    }
+  ]
+},
+
+/* ══════ OBJECTIF 3 : Associer verbe conjugué à la personne ══════ */
+{
+  obj:3, id:'3a',
+  title:"Leçon : qui parle ?",
+  icon:'📚', badge:'VESTIAIRE • LEÇON',
+  steps:[{type:'lesson_then_qcm',
+    conseil:{avatar:'❄️', speaker:'Micro-Ice', text:`"Chaque verbe dit <strong>qui</strong> fait l'action grâce au sujet. Je, tu, il/elle, nous, vous, ils/elles : voilà les 6 personnes !"` },
+    lesson:`Le sujet du verbe nous dit <strong>qui</strong> fait l'action :<br>
+    <em>j'ai joué → 1re sing.</em> &nbsp;|&nbsp; <em>tu as joué → 2e sing.</em> &nbsp;|&nbsp; <em>il/elle a joué → 3e sing.</em><br>
+    <em>nous avons joué → 1re plur.</em> &nbsp;|&nbsp; <em>vous avez joué → 2e plur.</em> &nbsp;|&nbsp; <em>ils/elles ont joué → 3e plur.</em>`,
+    story:`Clamp projette un hologramme avec les stats du match. "À chaque action, il faut savoir qui l'a faite !"`,
+    q:"« J'ai dribblé le gardien. » À quelle personne ?",
+    choices:["1re sing.","2e sing.","3e sing.","1re plur."], answer:0,
+    feedback:"J' = je = 1re personne du singulier ✅"
+  }]
+},{
+  obj:3, id:'3b',
+  title:"Relier : verbe → personne",
+  icon:'🔗', badge:'ANALYSIS • RELIER',
+  steps:[
+    {type:'relier',
+      story:`Clamp affiche les actions du match. "Associe chaque forme verbale à sa personne !"`,
+      conseil:{avatar:'❄️', speaker:'Micro-Ice', text:`"Regarde le sujet avant le verbe. C'est lui qui donne la personne !"` },
+      pairs:[
+        {left:'j\'ai tiré',           right:'1re sing.'},
+        {left:'tu as marqué',         right:'2e sing.'},
+        {left:'D\'Jok a dribblé',     right:'3e sing.'},
+        {left:'nous avons gagné',     right:'1re plur.'},
+      ]
+    },
+    {type:'relier',
+      story:`Un autre tableau de stats apparaît.`,
+      pairs:[
+        {left:'vous avez défendu',    right:'2e plur.'},
+        {left:'ils ont couru',        right:'3e plur.'},
+        {left:'Tia a passé',          right:'3e sing.'},
+        {left:'j\'ai bloqué',         right:'1re sing.'},
+      ]
+    }
+  ]
+},{
+  obj:3, id:'3c',
+  title:"Puzzle : formes conjuguées",
+  icon:'🧩', badge:'ANALYSIS • PUZZLE',
+  steps:[
+    {type:'puzzle',
+      story:`Rocket assemble des cartes tactiques. "Assemble les paires !"`,
+      conseil:{avatar:'❄️', speaker:'Micro-Ice', text:`"Le sujet te donne la personne. Cherche qui fait l'action !"` },
+      pairs:[
+        {left:'tu as gagné',         right:'2e sing.'},
+        {left:'nous avons couru',    right:'1re plur.'},
+        {left:'elles ont marqué',    right:'3e plur.'},
+        {left:'il a tiré',           right:'3e sing.'},
+      ]
+    }
+  ]
+},{
+  obj:3, id:'3d',
+  title:"QCM : à quelle personne ?",
+  icon:'❓', badge:'DEMI-FINALE • QUIZ',
+  steps:[
+    {type:'qcm',
+      story:`Le commentateur demande aux joueurs de vérifier les stats.`,
+      q:"« Vous avez joué un excellent match. » — Quelle personne ?",
+      choices:["1re sing.","3e sing.","2e plur.","1re plur."], answer:2,
+      feedback:"Vous = 2e personne du pluriel ✅"
+    },
+    {type:'qcm',
+      q:"« Ils ont marqué trois buts. » — Quelle personne ?",
+      choices:["1re plur.","2e plur.","3e plur.","3e sing."], answer:2,
+      feedback:"Ils = 3e personne du pluriel 🌟"
+    },
+    {type:'qcm',
+      q:"« Meï a défendu toute la nuit. » — Quelle personne ?",
+      choices:["1re sing.","3e sing.","2e sing.","3e plur."], answer:1,
+      feedback:"Meï = elle = 3e personne du singulier ✅"
+    }
+  ]
+},
+
+/* ══════ OBJECTIF 4 : Être ou Avoir ══════ */
+{
+  obj:4, id:'4a',
+  title:"Leçon : être ou avoir ?",
+  icon:'📚', badge:'FACULTY • LEÇON',
+  steps:[{type:'lesson_then_qcm',
+    conseil:{avatar:'❄️', speaker:'Micro-Ice', text:`"La <strong>maison d'être</strong> 🏠 : aller, venir, partir, arriver, entrer, sortir, naître, mourir, rester, tomber, monter, descendre, passer, retourner. Tous les autres → avoir !"` },
+    lesson:`<strong>AVOIR</strong> → presque tous les verbes : <em>j'ai joué, il a couru, tu as mangé…</em><br>
+    <strong>ÊTRE</strong> → verbes de mouvement/état (la maison d'être 🏠) :<br>
+    <em>aller, venir, partir, arriver, entrer, sortir, naître, mourir, rester, tomber, monter, descendre, passer, retourner</em><br>
+    ⚠️ Avec <strong>AVOIR</strong>, on n'accorde jamais le participe passé. Pas de danger !`,
+    story:`Aarch dessine une maison au tableau. "La maison d'être — si le verbe y habite, tu utilises être. Sinon : avoir !"`,
+    q:"D'Jok ___ marqué un but. Quel auxiliaire ?",
+    choices:["est","a"], answer:1,
+    feedback:"AVOIR ! 'marquer' n'est pas dans la maison d'être. Avec avoir : pas d'accord ! ✅"
+  }]
+},{
+  obj:4, id:'4b',
+  title:"Jeu de vitesse : être ou avoir !",
+  icon:'⚡', badge:'REFLEXES • VITESSE',
+  steps:[
+    {type:'speed',
+      story:`Clamp active l'Holotrainer. "Il faut être rapide comme le Souffle ! Un verbe apparaît, tu cliques sur le bon auxiliaire !"`,
+      conseil:{avatar:'❄️', speaker:'Micro-Ice', text:`"Pense vite ! La maison d'être : aller, venir, partir, arriver, entrer, sortir, rester, tomber… Le reste → avoir !"` },
+      verbs:[
+        {v:'marquer',   aux:'avoir'},
+        {v:'arriver',   aux:'être'},
+        {v:'tirer',     aux:'avoir'},
+        {v:'partir',    aux:'être'},
+        {v:'gagner',    aux:'avoir'},
+        {v:'tomber',    aux:'être'},
+        {v:'dribbler',  aux:'avoir'},
+        {v:'venir',     aux:'être'},
+      ]
+    }
+  ]
+},{
+  obj:4, id:'4c',
+  title:"Glisse les verbes dans les boîtes",
+  icon:'📦', badge:'VESTIAIRE • TRI',
+  steps:[
+    {type:'boxes',
+      story:`Aarch dispose deux boîtes sur la table. "Glisse chaque verbe dans la bonne boîte : être ou avoir !"`,
+      conseil:{avatar:'❄️', speaker:'Micro-Ice', text:`"Glisse et dépose ! Valide quand tu as tout mis. Si tu te trompes, tu pourras corriger !"` },
+      verbs:[
+        {v:'aller',    aux:'être'},
+        {v:'tirer',    aux:'avoir'},
+        {v:'entrer',   aux:'être'},
+        {v:'marquer',  aux:'avoir'},
+        {v:'sortir',   aux:'être'},
+        {v:'dribbler', aux:'avoir'},
+        {v:'rester',   aux:'être'},
+        {v:'passer',   aux:'avoir'},
+      ]
+    }
+  ]
+},{
+  obj:4, id:'4d',
+  title:"Mets le bon auxiliaire",
+  icon:'✏️', badge:'CUP • FILL',
+  steps:[
+    {type:'qcm',
+      story:`Le match final approche. "Complète les phrases avec le bon auxiliaire !"`,
+      q:"Rocket ___ arrivé en retard. Quel auxiliaire ?",
+      choices:["est","a"], answer:0,
+      feedback:"ÊTRE ! 'arriver' est dans la maison d'être 🏠"
+    },
+    {type:'qcm',
+      q:"Les Snow Kids ___ gagné la Cup ! Quel auxiliaire ?",
+      choices:["sont","ont"], answer:1,
+      feedback:"AVOIR ! gagner → avoir. Pas d'accord avec avoir ! ✅"
+    },
+    {type:'qcm',
+      q:"Tia ___ partie avant le match. Quel auxiliaire ?",
+      choices:["est","a"], answer:0,
+      feedback:"ÊTRE ! 'partir' est dans la maison d'être 🏠"
+    },
+    {type:'qcm',
+      q:"Micro-Ice ___ dribblé trois joueurs. Quel auxiliaire ?",
+      choices:["est","a"], answer:1,
+      feedback:"AVOIR ! dribbler → avoir. Facile avec avoir ! ✅"
+    }
+  ]
+},{
+  obj:4, id:'4e',
+  title:"Vitesse — Niveau 2 !",
+  icon:'⚡', badge:'SHADOWS • VITESSE',
+  steps:[
+    {type:'speed',
+      story:`Sinedd ricane : "Votre Souffle faiblira !" Aarch répond : "Jamais ! Allez ${name}, encore plus vite !"`,
+      conseil:{avatar:'❄️', speaker:'Micro-Ice', text:`"Niveau 2 ! Plus de verbes et ça va vite. Reste concentré(e) sur la maison d'être !"` },
+      verbs:[
+        {v:'venir',     aux:'être'},
+        {v:'tirer',     aux:'avoir'},
+        {v:'descendre', aux:'être'},
+        {v:'bloquer',   aux:'avoir'},
+        {v:'naître',    aux:'être'},
+        {v:'accélérer', aux:'avoir'},
+        {v:'retourner', aux:'être'},
+        {v:'gagner',    aux:'avoir'},
+        {v:'monter',    aux:'être'},
+        {v:'marquer',   aux:'avoir'},
+      ]
+    }
+  ]
+},
+
+/* ══════ OBJECTIF 5 : Conjuguer au passé composé ══════ */
+{
+  obj:5, id:'5a',
+  title:"La lettre de Meï",
+  icon:'💌', badge:'AKILLIAN • LETTRE',
+  steps:[
+    {type:'letter',
+      story:`Meï veut écrire à ses parents. Elle a besoin de ton aide pour conjuguer les verbes au passé composé !`,
+      conseil:{avatar:'❄️', speaker:'Micro-Ice', text:`"Aide Meï ! Écris le verbe au passé composé dans chaque espace. Je suis là si tu as des doutes !"` },
+      letter:`Chère famille,<br><br>
+      Tout va bien ici ! Cette semaine, nous [avons joué|jouer] un match incroyable contre les Wambas. D'Jok [a marqué|marquer] deux buts ! Moi, j'[ai défendu|défendre] toute la partie. Ahito [a arrêté|arrêter] trois tirs difficiles. Rocket [est arrivé|arriver] juste à temps avant le coup d'envoi.<br><br>
+      Aarch [a dit|dire] que nous progressons vite. Je vous embrasse fort,<br><br>Meï 💙`,
+      answers:["avons joué","a marqué","ai défendu","ai arrêté","est arrivé","a dit"]
+    }
+  ]
+},{
+  obj:5, id:'5b',
+  title:"Conjugue ! (avec aide)",
+  icon:'✏️', badge:'STADIUM • CONJUGAISON',
+  steps:[
+    {type:'fill_with_help',
+      story:`Aarch crie depuis le banc : "Conjugue ces verbes au passé composé !"`,
+      conseil:{avatar:'❄️', speaker:'Micro-Ice', text:`"Pense : auxiliaire avoir/être + participe passé. Pour les verbes en -ER c'est toujours -É !"` },
+      q:`Conjugue "tirer" au passé composé (il) :`,
+      hint_pre:"il", hint_post:"", aux_hint:"a", pp_hint:"tiré",
+      answer:"a tiré", full:"il a tiré",
+      feedback:"'a tiré' — il + a (avoir) + tiré (pp). Parfait !"
+    },
+    {type:'fill_with_help',
+      q:`Conjugue "passer" au passé composé (nous) :`,
+      hint_pre:"nous", hint_post:"", aux_hint:"avons", pp_hint:"passé",
+      answer:"avons passé", full:"nous avons passé",
+      feedback:"'avons passé' — nous + avons + passé. Excellent !"
+    },
+    {type:'fill_with_help',
+      q:`"arriver" se conjugue avec ÊTRE. Conjugue (il) :`,
+      hint_pre:"il", hint_post:"",aux_hint:"est", pp_hint:"arrivé",
+      answer:"est arrivé", full:"il est arrivé",
+      feedback:"'est arrivé' — il + est + arrivé. Avec être ! ✅"
+    },
+    {type:'fill_with_help',
+      q:`Conjugue "gagner" au passé composé (ils) :`,
+      hint_pre:"ils", hint_post:"", aux_hint:"ont", pp_hint:"gagné",
+      answer:"ont gagné", full:"ils ont gagné",
+      feedback:"'ont gagné' — ils + ont + gagné. VICTOIRE ! 🏆"
+    }
+  ]
+},{
+  obj:5, id:'5c',
+  title:"La grande finale !",
+  icon:'🏆', badge:'GALACTIK CUP • FINALE',
+  steps:[
+    {type:'qcm',
+      story:`C'est la finale de la Galactik Football Cup ! ${name}, tout repose sur toi. Conjugue ces verbes au passé composé !`,
+      conseil:{avatar:'❄️', speaker:'Micro-Ice', text:`"Dernière ligne droite ! Tu maîtrises le Souffle maintenant. Fais-le pour les Snow Kids !"` },
+      q:"D'Jok ___ le ballon vers le but. (tirer, passé composé, il)",
+      choices:["tirait le ballon","a tiré le ballon","tirera le ballon","tire le ballon"], answer:1,
+      feedback:"'a tiré' → passé composé avec avoir ! ⚽"
+    },
+    {type:'qcm',
+      q:"Tia ___ au milieu du terrain. (courir, passé composé, elle)",
+      choices:["courra","courait","a couru","court"], answer:2,
+      feedback:"'a couru' → passé composé avec avoir ! 🌟"
+    },
+    {type:'qcm',
+      q:"Rocket ___ dans le stade à toute vitesse. (entrer, passé composé, il)",
+      choices:["entrait","entrera","a entré","est entré"], answer:3,
+      feedback:"'est entré' → passé composé avec ÊTRE ! 'entrer' est dans la maison d'être 🏠"
+    },
+    {type:'qcm',
+      q:"Les Snow Kids ___. (gagner, passé composé, ils)",
+      choices:["ont gagné","sont gagnés","gagnaient","gagneront"], answer:0,
+      feedback:"'ont gagné' → passé composé avec avoir. Pas d'accord ! LA COUPE EST À NOUS ! 🏆🌟"
+    }
+  ]
+}
+
+]; // end missions
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   OBJECTIVES META
+═══════════════════════════════════════════════════════════════ */
+const OBJ_LABELS = {
+  1:"Infinitif → Participe passé",
+  2:"Repérer le passé composé",
+  3:"Verbe → Personne",
+  4:"Être ou Avoir ?",
+  5:"Conjuguer au passé composé"
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   NAVIGATION HELPERS
+═══════════════════════════════════════════════════════════════ */
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HOME IMAGES
+═══════════════════════════════════════════════════════════════ */
+(()=>{
+  const wrap=document.getElementById('home-imgs');
+  // Try to load images/1.png, 2.png, 3.png
+  for(let i=1;i<=3;i++){
+    const img=document.createElement('img');
+    img.src=`images/${i}.png`;
+    img.alt='';
+    img.style.cssText='height:80px;border-radius:10px;border:2px solid rgba(77,166,255,.2);object-fit:cover;';
+    img.onerror=()=>img.remove();
+    wrap.appendChild(img);
   }
 })();
 
-// ============================================================
-//  STATE
-// ============================================================
-let playerName = '';
-let currentMissionIndex = 0;
-let currentQuestionIndex = 0;
-let missionStars = [];
-let totalStars = 0;
-let selectedMatchA = null;
-let matchedPairs = 0;
-let tempStars = 0; // stars earned in current mission
+/* ═══════════════════════════════════════════════════════════════
+   LAUNCH INTRO
+═══════════════════════════════════════════════════════════════ */
+function launchIntro(){
+  const n=document.getElementById('player-name').value.trim();
+  G.name=n||'Champion';
+  G.missionStars=new Array(30).fill(0);
+  G.currentMission=0;
 
-// ============================================================
-//  MISSIONS DATA
-// ============================================================
-function getMissions(name) {
-  return [
-    // ── MISSION 1 : infinitif → participe passé (1er groupe) ──
-    {
-      id: 1, title: "Mission 1 : L'Entraînement",
-      icon: '⚽', type: 'lesson+qcm',
-      badge: 'AKILLIAN • RECRUTEMENT',
-      story: `Aarch te fait entrer dans le stade d'Akillian. "Bienvenue, ${name} !", dit-il. "Avant de jouer, il faut apprendre le Souffle de la conjugaison. Le participe passé, c'est notre première arme !"`,
-      lesson: `<strong>Les verbes du 1er groupe</strong> (infinitif en <strong>-ER</strong>) ont un participe passé en <strong>-É</strong>.<br>
-      Exemples : marquer → marqué &nbsp;|&nbsp; tirer → tiré &nbsp;|&nbsp; passer → passé`,
-      questions: [
-        { q: "Quel est le participe passé de « tirer » ?", choices:["tiré","tiru","tirit","tirés"], answer:0, feedback:"Bravo ! tirer → tiré (1er groupe, ça finit en -É !)" },
-        { q: "Quel est le participe passé de « marquer » ?", choices:["marquis","marqu","marqué","marquer"], answer:2, feedback:"Excellent ! marquer → marqué ⚽" },
-        { q: "Quel est le participe passé de « passer » ?", choices:["passé","passis","passit","passur"], answer:0, feedback:"Parfait ! passer → passé. Tu maîtrises le Souffle !" },
-        { q: "Quel est le participe passé de « dribbler » ?", choices:["dribblir","dribblé","dribblu","dribblit"], answer:1, feedback:"Oui ! dribbler → dribblé 🌟" },
-      ]
-    },
+  const modal=document.getElementById('video-modal');
+  modal.classList.add('open');
 
-    // ── MISSION 2 : participe passé verbes irréguliers ──
-    {
-      id: 2, title: "Mission 2 : Pouvoirs Spéciaux",
-      icon: '🌬️', type: 'qcm',
-      badge: 'AKILLIAN • LE SOUFFLE',
-      story: `Micro-Ice te glisse à l'oreille : "${name}, méfie-toi des verbes irréguliers ! Ils ont des participes passés surprenants. Être → été, avoir → eu, finir → fini, prendre → pris…"`,
-      lesson: `Les autres verbes ont des participes passés en <strong>-i, -is, -it, -t</strong> ou <strong>-u</strong>.<br>
-      Astuce : pense au féminin ! <em>pris → prise</em>, donc <em>pris</em>. <em>fini → finie</em>, donc <em>fini</em>.`,
-      questions: [
-        { q: "Quel est le participe passé de « finir » ?", choices:["finé","finis","fini","finait"], answer:2, feedback:"Oui ! finir → fini. Groupe 2, ça finit en -i !" },
-        { q: "Quel est le participe passé de « prendre » ?", choices:["prendé","pris","prenu","prend"], answer:1, feedback:"Exact ! prendre → pris. Pense à la féminine : prise ✅" },
-        { q: "Quel est le participe passé de « avoir » ?", choices:["avoiré","avi","eu","avé"], answer:2, feedback:"Bravo ! avoir → eu. Verbe irrégulier !" },
-        { q: "Quel est le participe passé de « être » ?", choices:["ésé","étit","étu","été"], answer:3, feedback:"Excellent ! être → été 🌟" },
-      ]
-    },
-
-    // ── MISSION 3 : Reconnaître le passé composé ──
-    {
-      id: 3, title: "Mission 3 : Match contre les Wambas",
-      icon: '🔵', type: 'qcm',
-      badge: 'CUP • TOUR 1 • WAMBAS',
-      story: `Les Snow Kids affrontent les Wambas ! D'Jok crie : "${name}, peux-tu repérer les verbes au passé composé dans mon commentaire de match ?"`,
-      lesson: `Le <strong>passé composé</strong> = auxiliaire (<em>avoir</em> ou <em>être</em>) conjugué + participe passé.<br>
-      Exemples : <em>il a tiré</em> ✔ &nbsp;|&nbsp; <em>il tire</em> ✗ (présent) &nbsp;|&nbsp; <em>il tirait</em> ✗ (imparfait)`,
-      questions: [
-        { q: "Quelle phrase est au passé composé ?", choices:["D'Jok tire le ballon.","D'Jok a tiré le ballon.","D'Jok tirait le ballon.","D'Jok tirera."], answer:1, feedback:"'a tiré' = auxiliaire avoir + participe passé → passé composé ! ✅" },
-        { q: "Quelle phrase est au passé composé ?", choices:["Ahito arrêtait le tir.","Ahito arrête le tir.","Ahito a arrêté le tir.","Ahito arrêtera."], answer:2, feedback:"'a arrêté' → passé composé ! Bravo ! 🧤" },
-        { q: "Laquelle N'est PAS au passé composé ?", choices:["Micro-Ice a dribblé.","Tia a passé le ballon.","Rocket courait vite.","D'Jok a marqué."], answer:2, feedback:"'courait' est à l'imparfait, pas au passé composé !" },
-        { q: "Quelle phrase est au passé composé ?", choices:["Les Snow Kids gagnaient.","Les Snow Kids ont gagné !","Les Snow Kids gagnent !","Les Snow Kids gagneront."], answer:1, feedback:"'ont gagné' → passé composé ! VICTOIRE ! 🏆" },
-      ]
-    },
-
-    // ── MISSION 4 : associer sujet ──
-    {
-      id: 4, title: "Mission 4 : Qui a fait quoi ?",
-      icon: '👤', type: 'qcm',
-      badge: 'CUP • ANALYSE DU JEU',
-      story: `Clamp étudie les statistiques du match. "${name}, aide-moi à retrouver à quelle personne chaque verbe est conjugué !"`,
-      lesson: `Le sujet du verbe nous dit <strong>qui</strong> fait l'action.<br>
-      <em>j'ai joué</em> → 1re pers. sing. &nbsp;|&nbsp; <em>tu as joué</em> → 2e pers. sing. &nbsp;|&nbsp; <em>il a joué</em> → 3e pers. sing.`,
-      questions: [
-        { q: "« J'ai dribblé le gardien. » — À quelle personne ?", choices:["1re pers. singulier","2e pers. singulier","3e pers. singulier","1re pers. pluriel"], answer:0, feedback:"Exact ! J' = je = 1re personne du singulier ✅" },
-        { q: "« Tu as marqué un but incroyable ! » — À quelle personne ?", choices:["1re pers. singulier","2e pers. singulier","3e pers. singulier","3e pers. pluriel"], answer:1, feedback:"Tu = 2e personne du singulier. Bravo !" },
-        { q: "« Tia a passé le ballon à D'Jok. » — À quelle personne ?", choices:["1re pers. singulier","2e pers. singulier","3e pers. singulier","1re pers. pluriel"], answer:2, feedback:"Tia → il/elle = 3e personne du singulier 🌟" },
-        { q: "« Nous avons gagné la Cup ! » — À quelle personne ?", choices:["1re pers. singulier","2e pers. pluriel","3e pers. pluriel","1re pers. pluriel"], answer:3, feedback:"Nous = 1re personne du pluriel. Toute l'équipe a gagné ! 🏆" },
-      ]
-    },
-
-    // ── MISSION 5 : être ou avoir ──
-    {
-      id: 5, title: "Mission 5 : Les Shadows attaquent !",
-      icon: '🌑', type: 'qcm',
-      badge: 'CUP • DEMI-FINALE • SHADOWS',
-      story: `Sinedd et les Shadows arrivent ! Aarch chuchote : "${name}, pour les battre il faut maîtriser l'auxiliaire. Être ou avoir, voilà la clé !"`,
-      lesson: `<strong>AVOIR</strong> → la plupart des verbes : <em>il a couru, elle a mangé, j'ai joué…</em><br>
-      <strong>ÊTRE</strong> → les verbes de déplacement/état + tous les verbes pronominaux : aller, venir, partir, arriver, entrer, sortir, naître, mourir, rester, tomber, monter, descendre, passer, retourner.<br>
-      Astuce : <em>"La maison d'être"</em> 🏠`,
-      questions: [
-        { q: "« D'Jok ___ marqué un but. » — Quel auxiliaire ?", choices:["est","a"], answer:1, feedback:"AVOIR ! 'marquer' n'est pas un verbe de déplacement. Pas de danger avec avoir ! ✅" },
-        { q: "« Rocket ___ arrivé en retard. » — Quel auxiliaire ?", choices:["est","a"], answer:0, feedback:"ÊTRE ! 'arriver' est un verbe de déplacement → auxiliaire être 🏠" },
-        { q: "« Les Snow Kids ___ gagné ! » — Quel auxiliaire ?", choices:["sont","ont"], answer:1, feedback:"AVOIR ! gagner → auxiliaire avoir. Pas d'accord ! ✅" },
-        { q: "« Tia ___ partie avant le match. » — Quel auxiliaire ?", choices:["est","a"], answer:0, feedback:"ÊTRE ! 'partir' est dans la maison d'être 🏠" },
-        { q: "« Micro-Ice ___ dribblé trois joueurs. » — Quel auxiliaire ?", choices:["est","a"], answer:1, feedback:"AVOIR ! dribbler → avoir. Facile avec avoir ! ✅" },
-      ]
-    },
-
-    // ── MISSION 6 : conjuguer au passé composé ──
-    {
-      id: 6, title: "Mission 6 : Le Grand Match",
-      icon: '🌟', type: 'fill',
-      badge: 'CUP • FINALE • GALACTIK STADIUM',
-      story: `C'est la finale de la Galactik Football Cup ! ${name}, tu es sur le terrain avec les Snow Kids. Conjugue ces verbes au passé composé pour activer le Souffle !`,
-      lesson: `Rappel : auxiliaire conjugué au <strong>présent</strong> + <strong>participe passé</strong>.<br>
-      <em>je joue → j'<strong>ai joué</strong></em> &nbsp;|&nbsp; <em>il joue → il <strong>a joué</strong></em>`,
-      questions: [
-        { pre:"Micro-Ice", verb:"marquer", person:"il", q:`Conjugue "marquer" au passé composé à la 3e personne du singulier :`, answer:"a marqué", hint:"il ___ marqué", feedback:"'a marqué' — il + avoir (conjugué) + marqué (pp). Excellent !" },
-        { pre:"D'Jok", verb:"tirer", person:"je", q:`Conjugue "tirer" au passé composé à la 1re personne :`, answer:"ai tiré", hint:"j'___ tiré", feedback:"'ai tiré' — j'ai + tiré. Le Souffle t'appartient ! 🌬️" },
-        { pre:"Tia", verb:"passer", person:"elle", q:`Conjugue "passer" au passé composé à la 3e pers. sing. :`, answer:"a passé", hint:"elle ___ passé", feedback:"'a passé' — elle a + passé. Parfait !" },
-        { pre:"Rocket", verb:"arriver", person:"il", q:`"arriver" se conjugue avec ÊTRE. Conjugue à la 3e pers. sing. :`, answer:"est arrivé", hint:"il ___ arrivé", feedback:"'est arrivé' — il est + arrivé. Avec être, ça marche ! ✅" },
-        { pre:"Les Snow Kids", verb:"gagner", person:"ils", q:`Conjugue "gagner" à la 3e personne du PLURIEL :`, answer:"ont gagné", hint:"ils ___ gagné", feedback:"'ont gagné' — ils ont + gagné. PAS D'ACCORD avec avoir ! 🏆" },
-      ]
-    },
-
-    // ── MISSION 7 : présent indicatif ──
-    {
-      id: 7, title: "Mission 7 : Entraînement présent",
-      icon: '🔵', type: 'qcm',
-      badge: 'FACULTY • PRÉSENT',
-      story: `Clamp active l'Holotrainer. "${name}, pour progresser il faut aussi maîtriser le présent ! Les verbes du 1er groupe suivent tous le même schéma."`,
-      lesson: `Présent des verbes en <strong>-ER</strong> : je joue, tu joues, il joue, nous jouons, vous jouez, ils jouent.<br>
-      La base ne change pas, seule la terminaison change !`,
-      questions: [
-        { q: "« Tu ___ le ballon vers le but. » (tirer)", choices:["tires","tire","tirent","tirez"], answer:0, feedback:"Tu tires ! La terminaison est -es avec tu. ✅" },
-        { q: "« Ils ___ le terrain. » (traverser)", choices:["traverse","traverses","traversez","traversent"], answer:3, feedback:"Ils traversent ! -ent avec ils/elles. 🌟" },
-        { q: "« Nous ___ ensemble. » (entraîner)", choices:["entraîne","entraînes","entraînons","entraînent"], answer:2, feedback:"Nous entraînons ! -ons avec nous. ⚽" },
-        { q: "« Je ___ le Souffle. » (maîtriser)", choices:["maîtrises","maîtrise","maîtrisez","maîtrisent"], answer:1, feedback:"Je maîtrise ! -e avec je. Bravo !" },
-      ]
-    },
-
-    // ── MISSION 8 : imparfait ──
-    {
-      id: 8, title: "Mission 8 : Souvenirs d'Akillian",
-      icon: '❄️', type: 'qcm',
-      badge: 'AKILLIAN • IMPARFAIT',
-      story: `Aarch se souvient du passé : "Il y a 15 ans, avant la Grande Glaciation, l'équipe d'Akillian ___ tous les matchs. Aide-moi à conjuguer à l'imparfait, ${name}."`,
-      lesson: `Imparfait des verbes en <strong>-ER</strong> : je jouais, tu jouais, il jouait, nous jouions, vous jouiez, ils jouaient.<br>
-      La terminaison en -<strong>ais/-ait/-aient</strong> est la clé !`,
-      questions: [
-        { q: "« Avant, D'Jok ___ chaque jour. » (entraîner)", choices:["entraîne","entraînait","entraînera","a entraîné"], answer:1, feedback:"'entraînait' → imparfait ! -ait avec il/elle. ✅" },
-        { q: "« Nous ___ le Souffle. » (sentir, imparfait)", choices:["sentons","sentions","sentais","senti"], answer:1, feedback:"'sentions' → imparfait avec nous ! -ions. 🌬️" },
-        { q: "« Les joueurs ___ fort. » (courir → couraient)", choices:["courent","couraient","ont couru","courra"], answer:1, feedback:"'couraient' → imparfait avec ils ! -aient. ⚡" },
-        { q: "« Tu ___ toujours le premier. » (arriver, imparfait)", choices:["arrives","arriveras","arrivais","es arrivé"], answer:2, feedback:"'arrivais' → imparfait avec tu ! -ais. 🌟" },
-      ]
-    },
-
-    // ── MISSION 9 : futur ──
-    {
-      id: 9, title: "Mission 9 : Vers la Victoire !",
-      icon: '🚀', type: 'qcm',
-      badge: 'GALACTIK CUP • FUTUR',
-      story: `Tia motive l'équipe : "Un jour, nous ___ la Cup ! ${name}, conjugue ces verbes au futur pour allumer le Souffle !"`,
-      lesson: `Futur des verbes en <strong>-ER</strong> : je jouerai, tu joueras, il jouera, nous jouerons, vous jouerez, ils joueront.<br>
-      On ajoute -<strong>rai/-ras/-ra/-rons/-rez/-ront</strong> à l'infinitif !`,
-      questions: [
-        { q: "« Demain, nous ___ le match. » (gagner)", choices:["gagnons","gagnions","gagnerons","gagnons"], answer:2, feedback:"'gagnerons' → futur avec nous ! -ons sur l'infinitif. 🏆" },
-        { q: "« D'Jok ___ le but de la victoire. » (marquer)", choices:["marquait","marquera","a marqué","marque"], answer:1, feedback:"'marquera' → futur avec il ! -ra. ⚽" },
-        { q: "« Tu ___ le Souffle un jour ! » (maîtriser)", choices:["maîtriseras","maîtrisais","as maîtrisé","maîtrises"], answer:0, feedback:"'maîtriseras' → futur avec tu ! -ras. 🌬️" },
-        { q: "« Les Snow Kids ___ la galaxie ! » (épater)", choices:["épataient","ont épaté","épateront","épatent"], answer:2, feedback:"'épateront' → futur avec ils ! -ront. INCROYABLE ! 🌟" },
-      ]
-    },
-
-    // ── MISSION 10 : FINALE TOTALE ──
-    {
-      id: 10, title: "Mission FINALE : La Cup !!",
-      icon: '🏆', type: 'fill',
-      badge: 'GALACTIK FOOTBALL CUP • FINALE',
-      story: `La Galactik Football Cup est en jeu ! Aarch compte sur toi, ${name}. Prouve que tu es le/la meilleur(e) Snow Kid de la galaxie en conjuguant ces verbes !`,
-      lesson: `Récap' express :<br>
-      Présent : je <strong>joue</strong> | Imparfait : je <strong>jouais</strong> | Futur : je <strong>jouerai</strong> | Passé composé : j'<strong>ai joué</strong>`,
-      questions: [
-        { verb:"marquer", person:"il", tense:"futur", q:`Conjugue "marquer" au FUTUR (il) :`, answer:"marquera", hint:"il ___", feedback:"'marquera' → futur ! ⚽" },
-        { verb:"tirer", person:"nous", tense:"présent", q:`Conjugue "tirer" au PRÉSENT (nous) :`, answer:"tirons", hint:"nous ___", feedback:"'tirons' → présent ! ✅" },
-        { verb:"gagner", person:"ils", tense:"imparfait", q:`Conjugue "gagner" à l'IMPARFAIT (ils) :`, answer:"gagnaient", hint:"ils ___", feedback:"'gagnaient' → imparfait ! 🌟" },
-        { verb:"passer", person:"il", tense:"passé composé", q:`Conjugue "passer" au PASSÉ COMPOSÉ (il) :`, answer:"a passé", hint:"il ___", feedback:"'a passé' → passé composé ! 🏆" },
-        { verb:"arriver", person:"elle", tense:"passé composé", q:`"arriver" (être). Conjugue au PASSÉ COMPOSÉ (elle) :`, answer:"est arrivée", hint:"elle ___", feedback:"'est arrivée' ! Avec être, le pp s'accorde. Ici : féminin singulier → -ée. Bravo champion(ne) !" },
-      ]
-    },
-  ];
+  // try to load video
+  const vid=document.getElementById('intro-video');
+  const ph=document.getElementById('video-placeholder');
+  vid.src='intro.mp4';
+  vid.oncanplay=()=>{ ph.style.display='none'; vid.style.display=''; vid.play(); };
+  vid.onerror=()=>{ /* placeholder stays */ };
+  vid.onended=()=>closeIntroVideo();
 }
 
-// ============================================================
-//  NAVIGATION
-// ============================================================
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+function closeIntroVideo(){
+  document.getElementById('video-modal').classList.remove('open');
+  buildTeamPage();
+  showPage('page-team');
 }
 
-function showMap() {
-  showPage('page-map');
-  renderBoard();
-  updateGlobalStars();
-}
-
-// ============================================================
-//  START GAME
-// ============================================================
-function startGame() {
-  const input = document.getElementById('player-name').value.trim();
-  playerName = input || 'Champion';
-  missionStars = new Array(10).fill(0);
-  totalStars = 0;
-  currentMissionIndex = 0;
-  document.getElementById('map-name-display').textContent = playerName;
-  showMap();
-}
-
-// ============================================================
-//  BOARD RENDER
-// ============================================================
-function renderBoard() {
-  const missions = getMissions(playerName);
-  const track = document.getElementById('board-track');
-  track.innerHTML = '';
-
-  missions.forEach((m, idx) => {
-    const cell = document.createElement('div');
-    cell.className = 'cell';
-
-    const completed = missionStars[idx] > 0;
-    const isCurrent = idx === currentMissionIndex;
-    const locked = idx > currentMissionIndex;
-
-    if(completed) cell.classList.add('completed');
-    else if(isCurrent) cell.classList.add('current');
-    else if(locked) cell.classList.add('locked');
-
-    if(idx === 0) cell.classList.add('start');
-    if(idx === missions.length - 1) cell.classList.add('finish');
-
-    cell.innerHTML = `
-      <div class="cell-num">${idx+1}</div>
-      <div class="cell-icon">${m.icon}</div>
-      <div class="cell-label">${m.title.split(':')[1]?.trim() || m.title}</div>
-      ${isCurrent ? '<div class="player-token">⚽</div>' : ''}
-      ${completed ? `<div style="position:absolute;top:4px;left:4px;font-size:0.8rem;">${'⭐'.repeat(missionStars[idx])}</div>` : ''}
-    `;
-
-    if(!locked) cell.addEventListener('click', () => startMission(idx));
-    track.appendChild(cell);
+/* ═══════════════════════════════════════════════════════════════
+   TEAM PAGE
+═══════════════════════════════════════════════════════════════ */
+function buildTeamPage(){
+  document.getElementById('team-name-display').textContent=G.name;
+  const grid=document.getElementById('team-grid');
+  grid.innerHTML='';
+  PLAYERS.forEach(p=>{
+    const el=document.createElement('div');
+    el.className='player-medal';
+    el.innerHTML=`
+      <div class="medal-img">
+        <img src="images/${p.id}.png" alt="${p.name}" onerror="this.style.display='none';this.parentNode.innerHTML='<span style=font-size:2.5rem>${p.emoji}</span>';">
+      </div>
+      <div class="medal-name">${p.name}</div>
+      <div class="medal-role">${p.role}</div>`;
+    grid.appendChild(el);
   });
 }
 
-function updateGlobalStars() {
-  totalStars = missionStars.reduce((a,b) => a+b, 0);
-  for(let i=1;i<=10;i++) {
-    const el = document.getElementById(`gs${i}`);
-    if(el) { el.className = 'star-icon ' + (totalStars >= i ? 'earned' : 'empty'); }
-  }
+function goToMissions(){
+  buildMissionsBoard();
+  showPage('page-missions');
 }
 
-// ============================================================
-//  MISSION START
-// ============================================================
-function startMission(idx) {
-  currentMissionIndex = idx;
-  currentQuestionIndex = 0;
-  tempStars = 0;
-  const missions = getMissions(playerName);
-  const mission = missions[idx];
-  showPage('page-exercise');
-  document.getElementById('ex-breadcrumb').textContent = mission.title;
-  renderQuestion(mission, 0);
-  updateProgressBar(mission, 0);
-}
+/* ═══════════════════════════════════════════════════════════════
+   MISSIONS BOARD
+═══════════════════════════════════════════════════════════════ */
+function buildMissionsBoard(){
+  const MISSIONS=buildMissions(G.name);
+  const board=document.getElementById('missions-board');
+  board.innerHTML='';
 
-function updateProgressBar(mission, qIdx) {
-  const total = mission.questions.length;
-  const pct = (qIdx / total) * 100;
-  document.getElementById('ex-progress-fill').style.width = pct + '%';
-  document.getElementById('ex-progress-label').textContent = `${qIdx} / ${total}`;
-  const stars = document.getElementById('ex-stars-display');
-  stars.innerHTML = '⭐'.repeat(missionStars[currentMissionIndex] || 0);
-}
-
-// ============================================================
-//  RENDER QUESTION
-// ============================================================
-function renderQuestion(mission, qIdx) {
-  const q = mission.questions[qIdx];
-  const area = document.getElementById('exercise-area');
-  document.getElementById('feedback-banner').style.display = 'none';
-  document.getElementById('btn-next').style.display = 'none';
-  selectedMatchA = null;
-
-  let html = '';
-
-  // Lesson box (first question only)
-  if(qIdx === 0 && mission.lesson) {
-    html += `<div class="lesson-box fade-in">📚 ${mission.lesson}</div>`;
+  // global stars
+  const totalStars=G.missionStars.reduce((a,b)=>a+b,0);
+  const maxStars=MISSIONS.length*3;
+  const gsbar=document.getElementById('global-stars-bar');
+  gsbar.innerHTML=`<span>Étoiles :</span>`;
+  const showStars=Math.min(totalStars,15);
+  for(let i=0;i<showStars;i++){
+    const s=document.createElement('span');
+    s.className='gstar on'; s.textContent='⭐'; gsbar.appendChild(s);
   }
+  gsbar.innerHTML+=`<span style="margin-left:4px;">${totalStars} / ${maxStars}</span>`;
 
-  html += `<div class="mission-card fade-in">`;
-  html += `<div class="mission-badge">🌌 ${mission.badge} • Q${qIdx+1}/${mission.questions.length}</div>`;
+  // group by obj
+  const byObj={};
+  MISSIONS.forEach((m,idx)=>{
+    if(!byObj[m.obj]) byObj[m.obj]=[];
+    byObj[m.obj].push({...m,idx});
+  });
 
-  if(qIdx === 0 && mission.story) {
-    html += `<div class="mission-story">${mission.story}</div>`;
-  }
+  Object.keys(byObj).forEach(obj=>{
+    const sec=document.createElement('div');
+    sec.className='obj-section';
+    sec.innerHTML=`<div class="obj-label">⚡ OBJECTIF ${obj} — ${OBJ_LABELS[obj]||''}</div>`;
+    const row=document.createElement('div');
+    row.className='missions-row';
 
-  html += `<div class="mission-question">❓ ${q.q}</div>`;
+    byObj[obj].forEach(({idx,icon,title})=>{
+      const stars=G.missionStars[idx];
+      const done=stars>0;
+      const isCurrent=idx===G.currentMission;
+      const locked=idx>G.currentMission;
 
-  if(mission.type === 'qcm' || mission.type === 'lesson+qcm') {
-    html += `<div class="choices-grid">`;
-    q.choices.forEach((c, ci) => {
-      html += `<button class="choice-btn" id="choice-${ci}" onclick="checkQCM(${ci}, ${q.answer}, '${escQ(q.feedback)}')">${c}</button>`;
+      const cell=document.createElement('div');
+      cell.className='mission-cell'+(done?' done':isCurrent?' current':locked?' locked':'');
+      cell.innerHTML=`
+        <div class="mc-num">${idx+1}</div>
+        <div class="mc-icon">${icon}</div>
+        <div class="mc-label">${title.replace(/^[^:]+:\s*/,'')}</div>
+        ${stars>0?`<div class="mc-stars">${'⭐'.repeat(stars)}</div>`:''}
+        ${isCurrent?`<div class="mc-token">⚽</div>`:''}`;
+      if(!locked) cell.addEventListener('click',()=>startMission(idx));
+      row.appendChild(cell);
     });
-    html += `</div>`;
-  } else if(mission.type === 'fill') {
-    html += `<div class="fill-wrap">
-      <span style="font-size:1rem; color:var(--text-muted);">${q.hint ? q.hint.split('___')[0] : ''}</span>
-      <input class="fill-input" id="fill-input" type="text" placeholder="..." autocomplete="off" autocorrect="off" spellcheck="false"
-        onkeydown="if(event.key==='Enter') checkFill('${escQ(q.answer)}','${escQ(q.feedback)}')" />
-      <span style="font-size:1rem; color:var(--text-muted);">${q.hint ? q.hint.split('___')[1] || '' : ''}</span>
-    </div>
-    <button class="btn btn-blue" style="margin-top:1rem;" onclick="checkFill('${escQ(q.answer)}','${escQ(q.feedback)}')">Valider ✓</button>`;
+    sec.appendChild(row);
+    board.appendChild(sec);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   START MISSION
+═══════════════════════════════════════════════════════════════ */
+let MISSIONS_CACHE=null;
+function getMissions(){ if(!MISSIONS_CACHE) MISSIONS_CACHE=buildMissions(G.name); return MISSIONS_CACHE; }
+
+function startMission(idx){
+  MISSIONS_CACHE=buildMissions(G.name);
+  G.currentMission=idx;
+  G.currentStep=0;
+  G.tempCorrect=0;
+  const m=getMissions()[idx];
+  G.totalSteps=m.steps.length;
+  document.getElementById('ex-bc').textContent=m.title;
+  updateProgress();
+  renderStep();
+  showPage('page-ex');
+}
+
+function updateProgress(){
+  const m=getMissions()[G.currentMission];
+  const pct=G.totalSteps>0?(G.currentStep/G.totalSteps)*100:0;
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-lbl').textContent=`${G.currentStep} / ${G.totalSteps}`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RENDER STEP
+═══════════════════════════════════════════════════════════════ */
+function renderStep(){
+  const m=getMissions()[G.currentMission];
+  const step=m.steps[G.currentStep];
+  const area=document.getElementById('ex-content');
+  hideFeedback();
+  hideNext();
+  area.innerHTML='';
+
+  // conseil bubble
+  if(step.conseil){
+    area.innerHTML+=`<div class="conseil-bubble">
+      <div class="conseil-avatar">${step.conseil.avatar}</div>
+      <div class="conseil-text"><strong>${step.conseil.speaker} :</strong> ${step.conseil.text}</div>
+    </div>`;
   }
 
-  html += `</div>`;
-  area.innerHTML = html;
+  // lesson
+  if(step.lesson){
+    area.innerHTML+=`<div class="lesson-box">📚 ${step.lesson}</div>`;
+  }
 
-  if(mission.type === 'fill') {
-    setTimeout(() => { const inp = document.getElementById('fill-input'); if(inp) inp.focus(); }, 100);
+  // story
+  if(step.story){
+    area.innerHTML+=`<div class="story-panel">${step.story}</div>`;
+  }
+
+  const card=document.createElement('div');
+  card.className='ex-card';
+  area.appendChild(card);
+
+  switch(step.type){
+    case 'lesson_then_qcm': renderQCM(card,step); break;
+    case 'qcm':             renderQCM(card,step); break;
+    case 'relier':          renderRelier(card,step); break;
+    case 'puzzle':          renderPuzzle(card,step); break;
+    case 'hunt':            renderHunt(card,step); break;
+    case 'tirbut':          renderTirAuBut(card,step); break;
+    case 'clicktext':       renderClickText(card,step); break;
+    case 'speed':           renderSpeed(card,step); break;
+    case 'boxes':           renderBoxes(card,step); break;
+    case 'letter':          renderLetter(card,step); break;
+    case 'fill_with_help':  renderFillHelp(card,step); break;
   }
 }
 
-function escQ(s) { return s.replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
-
-// ============================================================
-//  CHECK ANSWERS
-// ============================================================
-function checkQCM(chosen, correct, feedback) {
-  const btns = document.querySelectorAll('.choice-btn');
-  btns.forEach(b => b.disabled = true);
-  btns[chosen].classList.add(chosen === correct ? 'correct' : 'wrong');
-  if(chosen !== correct) btns[correct].classList.add('correct');
-  showFeedback(chosen === correct, feedback);
-  if(chosen === correct) tempStars++;
+/* ═══════════════════════════════════════════════════════════════
+   QCM
+═══════════════════════════════════════════════════════════════ */
+function renderQCM(card,step){
+  card.innerHTML=`<div class="q-text">❓ ${step.q}</div><div class="choices-grid" id="choices"></div>`;
+  const grid=card.querySelector('#choices');
+  step.choices.forEach((c,i)=>{
+    const btn=document.createElement('button');
+    btn.className='choice-btn';
+    btn.textContent=c;
+    btn.onclick=()=>checkQCM(i,step.answer,step.feedback,step.choices.length);
+    grid.appendChild(btn);
+  });
 }
 
-function checkFill(correct, feedback) {
-  const inp = document.getElementById('fill-input');
-  if(!inp) return;
-  const val = inp.value.trim().toLowerCase().replace(/['']/g, "'");
-  const answers = correct.toLowerCase().split('|');
-  const ok = answers.some(a => val === a.trim());
-  inp.disabled = true;
-  inp.classList.add(ok ? 'correct' : 'wrong');
-  if(!ok) {
-    const hint = document.createElement('div');
-    hint.style.cssText='margin-top:6px;font-size:0.85rem;color:var(--text-muted);';
-    hint.textContent = `✓ Réponse : ${correct}`;
-    inp.parentNode.appendChild(hint);
+function checkQCM(chosen,correct,feedback){
+  const btns=document.querySelectorAll('.choice-btn');
+  btns.forEach(b=>b.disabled=true);
+  const ok=chosen===correct;
+  btns[chosen].classList.add(ok?'ok':'ko');
+  if(!ok) btns[correct].classList.add('ok');
+  showFeedback(ok,feedback);
+  if(ok) G.tempCorrect++;
+  showNext();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RELIER
+═══════════════════════════════════════════════════════════════ */
+let relierState={selected:null,side:null,matched:0,total:0,lines:[]};
+
+function renderRelier(card,step){
+  relierState={selected:null,side:null,matched:0,total:step.pairs.length,lines:[]};
+  const shuffled=[...step.pairs].sort(()=>Math.random()-.5);
+  const shuffledRight=[...step.pairs].map(p=>p.right).sort(()=>Math.random()-.5);
+
+  card.innerHTML=`<div class="q-text">🔗 Relie chaque infinitif à son participe passé.</div>`;
+
+  const wrap=document.createElement('div');
+  wrap.style.cssText='position:relative;display:flex;gap:16px;';
+  const svgEl=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svgEl.style.cssText='position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:0;';
+  svgEl.setAttribute('width','100%');svgEl.setAttribute('height','100%');
+  wrap.appendChild(svgEl);
+
+  const leftCol=document.createElement('div');
+  leftCol.style.cssText='flex:1;display:flex;flex-direction:column;gap:8px;';
+  const rightCol=document.createElement('div');
+  rightCol.style.cssText='flex:1;display:flex;flex-direction:column;gap:8px;align-items:flex-end;';
+
+  shuffled.forEach((p,i)=>{
+    const el=makeRelierItem(p.left,'left',i);
+    leftCol.appendChild(el);
+  });
+  shuffledRight.forEach((r,i)=>{
+    const el=makeRelierItem(r,'right',i);
+    rightCol.appendChild(el);
+  });
+
+  wrap.appendChild(leftCol);
+  wrap.appendChild(rightCol);
+  card.appendChild(wrap);
+
+  // store pairs for validation
+  wrap._pairs=step.pairs;
+  wrap._shuffledRight=shuffledRight;
+  wrap._shuffled=shuffled;
+  wrap._svgEl=svgEl;
+}
+
+function makeRelierItem(text,side,idx){
+  const el=document.createElement('div');
+  el.className='relier-item';
+  el.textContent=text;
+  el.dataset.side=side;
+  el.dataset.val=text;
+  el.dataset.idx=idx;
+  el.onclick=()=>handleRelierClick(el);
+  return el;
+}
+
+function handleRelierClick(el){
+  if(el.classList.contains('matched')) return;
+  const side=el.dataset.side;
+  const val=el.dataset.val;
+
+  if(!relierState.selected){
+    relierState.selected=el;
+    relierState.side=side;
+    el.classList.add('selected');
+    return;
   }
-  showFeedback(ok, feedback);
-  if(ok) tempStars++;
-}
 
-function showFeedback(ok, msg) {
-  const fb = document.getElementById('feedback-banner');
-  fb.className = 'feedback-banner ' + (ok ? 'correct' : 'wrong');
-  fb.textContent = ok ? '✅ ' + msg : '❌ ' + msg;
-  fb.style.display = 'block';
-  document.getElementById('btn-next').style.display = 'block';
-}
+  // same side → switch
+  if(relierState.side===side){
+    relierState.selected.classList.remove('selected');
+    relierState.selected=el;
+    relierState.side=side;
+    el.classList.add('selected');
+    return;
+  }
 
-// ============================================================
-//  NEXT QUESTION / END MISSION
-// ============================================================
-function nextQuestion() {
-  const missions = getMissions(playerName);
-  const mission = missions[currentMissionIndex];
-  currentQuestionIndex++;
-  updateProgressBar(mission, currentQuestionIndex);
+  // different side → check
+  const leftVal  = side==='right' ? relierState.selected.dataset.val : val;
+  const rightVal = side==='right' ? val : relierState.selected.dataset.val;
+  const leftEl   = side==='right' ? relierState.selected : el;
+  const rightEl  = side==='right' ? el : relierState.selected;
 
-  if(currentQuestionIndex >= mission.questions.length) {
-    endMission(mission);
+  // find pair in card
+  const wrap=el.closest('div[style*="position:relative"]');
+  const pair=wrap._pairs.find(p=>p.left===leftVal && p.right===rightVal);
+
+  relierState.selected.classList.remove('selected');
+
+  if(pair){
+    leftEl.classList.add('matched');
+    rightEl.classList.add('matched');
+    // draw line
+    drawLine(wrap._svgEl,leftEl,rightEl);
+    relierState.matched++;
+    if(relierState.matched===relierState.total){
+      G.tempCorrect++;
+      showFeedback(true,'Toutes les paires sont reliées ! Excellent ! 🌟');
+      showNext();
+    }
   } else {
-    renderQuestion(mission, currentQuestionIndex);
+    leftEl.classList.add('error-flash');
+    rightEl.classList.add('error-flash');
+    setTimeout(()=>{leftEl.classList.remove('error-flash');rightEl.classList.remove('error-flash');},600);
+  }
+  relierState.selected=null;
+  relierState.side=null;
+}
+
+function drawLine(svg,elA,elB){
+  const svgRect=svg.getBoundingClientRect();
+  const rA=elA.getBoundingClientRect();
+  const rB=elB.getBoundingClientRect();
+  const x1=rA.right-svgRect.left;
+  const y1=(rA.top+rA.height/2)-svgRect.top;
+  const x2=rB.left-svgRect.left;
+  const y2=(rB.top+rB.height/2)-svgRect.top;
+  const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+  line.setAttribute('x1',x1);line.setAttribute('y1',y1);
+  line.setAttribute('x2',x2);line.setAttribute('y2',y2);
+  line.setAttribute('stroke','#2ecc71');line.setAttribute('stroke-width','2');
+  line.setAttribute('stroke-dasharray','4 3');
+  svg.appendChild(line);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PUZZLE
+═══════════════════════════════════════════════════════════════ */
+let puzzleState={selected:null,side:null,matched:0,total:0};
+
+function renderPuzzle(card,step){
+  puzzleState={selected:null,side:null,matched:0,total:step.pairs.length};
+
+  // shuffle right side
+  const lefts=[...step.pairs].sort(()=>Math.random()-.5);
+  const rights=[...step.pairs].map(p=>p.right).sort(()=>Math.random()-.5);
+
+  card.innerHTML=`<div class="q-text">🧩 Clique sur un infinitif, puis sur son participe passé.</div>`;
+
+  const grid=document.createElement('div');
+  grid.style.cssText='display:flex;gap:16px;';
+
+  const lc=document.createElement('div');
+  lc.style.cssText='flex:1;display:flex;flex-direction:column;gap:8px;';
+  const rc=document.createElement('div');
+  rc.style.cssText='flex:1;display:flex;flex-direction:column;gap:8px;';
+
+  lefts.forEach(p=>{
+    const el=makePuzzlePiece(p.left,'left');
+    lc.appendChild(el);
+  });
+  rights.forEach(r=>{
+    const el=makePuzzlePiece(r,'right');
+    rc.appendChild(el);
+  });
+  grid.appendChild(lc);
+  grid.appendChild(rc);
+  grid._pairs=step.pairs;
+  card.appendChild(grid);
+}
+
+function makePuzzlePiece(text,side){
+  const el=document.createElement('div');
+  el.className='puzzle-piece';
+  el.textContent=text;
+  el.dataset.side=side;
+  el.dataset.val=text;
+  el.onclick=()=>handlePuzzleClick(el);
+  return el;
+}
+
+function handlePuzzleClick(el){
+  if(el.classList.contains('matched')) return;
+  const side=el.dataset.side;
+
+  if(!puzzleState.selected){
+    puzzleState.selected=el;
+    puzzleState.side=side;
+    el.classList.add('selected');
+    return;
+  }
+  if(puzzleState.side===side){
+    puzzleState.selected.classList.remove('selected');
+    puzzleState.selected=el;
+    el.classList.add('selected');
+    return;
+  }
+
+  const leftVal  = side==='right' ? puzzleState.selected.dataset.val : el.dataset.val;
+  const rightVal = side==='right' ? el.dataset.val : puzzleState.selected.dataset.val;
+  const leftEl   = side==='right' ? puzzleState.selected : el;
+  const rightEl  = side==='right' ? el : puzzleState.selected;
+
+  const grid=el.closest('div[style*="flex;gap"]');
+  const pair=grid._pairs.find(p=>p.left===leftVal && p.right===rightVal);
+
+  puzzleState.selected.classList.remove('selected');
+
+  if(pair){
+    leftEl.classList.add('matched');
+    rightEl.classList.add('matched');
+    puzzleState.matched++;
+    if(puzzleState.matched===puzzleState.total){
+      G.tempCorrect++;
+      showFeedback(true,'Toutes les pièces sont assemblées ! 🧩🌟');
+      showNext();
+    }
+  } else {
+    leftEl.classList.add('error-flash');
+    rightEl.classList.add('error-flash');
+    setTimeout(()=>{leftEl.classList.remove('error-flash');rightEl.classList.remove('error-flash');},600);
+  }
+  puzzleState.selected=null;
+  puzzleState.side=null;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HUNT
+═══════════════════════════════════════════════════════════════ */
+function renderHunt(card,step){
+  const shuffled=[...step.words].sort(()=>Math.random()-.5);
+  card.innerHTML=`<div class="q-text">🔍 ${step.target_label}</div>`;
+  const grid=document.createElement('div');
+  grid.className='hunt-grid';
+  shuffled.forEach(w=>{
+    const el=document.createElement('div');
+    el.className='hunt-word';
+    el.textContent=w;
+    el.onclick=()=>{
+      if(w===step.answer){
+        el.classList.add('found');
+        // dim others
+        grid.querySelectorAll('.hunt-word:not(.found)').forEach(x=>x.classList.add('dimmed'));
+        G.tempCorrect++;
+        showFeedback(true,step.feedback);
+        showNext();
+      } else {
+        el.classList.add('error-flash');
+        setTimeout(()=>el.classList.remove('error-flash'),500);
+        showFeedback(false,`"${w}" n'est pas un infinitif correspondant. Cherche encore !`);
+      }
+    };
+    grid.appendChild(el);
+  });
+  card.appendChild(grid);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TIR AU BUT
+═══════════════════════════════════════════════════════════════ */
+let tirState={correct:0,total:0,done:0};
+
+function renderTirAuBut(card,step){
+  const balls=[...step.balls].sort(()=>Math.random()-.5);
+  tirState={correct:0,total:balls.filter(b=>b.isPC).length,done:0,allDone:false};
+
+  card.innerHTML=`<div class="q-text">⚽ Clique sur les ballons au <strong>passé composé</strong> pour marquer !</div>`;
+
+  const field=document.createElement('div');
+  field.className='foot-field';
+
+  // goal post decoration
+  field.innerHTML=`<svg class="foot-lines" viewBox="0 0 400 320" preserveAspectRatio="none">
+    <rect x="1" y="1" width="398" height="318" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="2"/>
+    <circle cx="200" cy="160" r="50" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+    <line x1="200" y1="1" x2="200" y2="318" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+  </svg>
+  <div class="goal-post"></div>
+  <div class="field-result" id="field-result"></div>`;
+
+  const ballWrap=document.createElement('div');
+  ballWrap.style.cssText='display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center;z-index:1;position:relative;';
+
+  balls.forEach((b,i)=>{
+    const btn=document.createElement('button');
+    btn.className='ball-btn';
+    btn.id=`ball-${i}`;
+    btn.innerHTML=`<span style="font-size:.7rem;font-weight:700;color:#222;text-align:center;padding:4px;line-height:1.2;">${b.text}</span>`;
+    btn.onclick=()=>handleTirAuBut(btn,b,i,balls.length);
+    ballWrap.appendChild(btn);
+  });
+
+  field.appendChild(ballWrap);
+  card.appendChild(field);
+}
+
+function handleTirAuBut(btn,ball,idx,total){
+  if(btn.disabled) return;
+  btn.disabled=true;
+  const fr=document.getElementById('field-result');
+
+  if(ball.isPC){
+    btn.classList.add('shooting');
+    fr.textContent='⚽ BUT !';
+    fr.style.color='#ffd93d';
+    fr.style.opacity='1';
+    tirState.correct++;
+  } else {
+    btn.classList.add('saved');
+    fr.textContent='😬 Manqué !';
+    fr.style.color='#ff3b4e';
+    fr.style.opacity='1';
+  }
+  setTimeout(()=>fr.style.opacity='0',1000);
+
+  tirState.done++;
+  // check if all PC balls clicked or all clicked
+  const allBalls=document.querySelectorAll('.ball-btn');
+  let allDisabled=true;
+  allBalls.forEach(b=>{ if(!b.disabled) allDisabled=false; });
+
+  if(tirState.done>=total || allDisabled){
+    setTimeout(()=>{
+      G.tempCorrect++;
+      showFeedback(true,`${tirState.correct} passés composés sur ${tirState.total} trouvés ! 🌟`);
+      showNext();
+    },800);
   }
 }
 
-function endMission(mission) {
-  const total = mission.questions.length;
-  const stars = Math.round((tempStars / total) * 3);
-  missionStars[currentMissionIndex] = Math.max(missionStars[currentMissionIndex] || 0, stars);
+/* ═══════════════════════════════════════════════════════════════
+   CLICK TEXT
+═══════════════════════════════════════════════════════════════ */
+function renderClickText(card,step){
+  const foundGroups=new Set();
+  let foundCount=0;
+  const totalGroups=step.pp_ids.length;
 
-  // Advance pointer
-  if(currentMissionIndex < getMissions(playerName).length - 1 && stars > 0) {
-    if(currentMissionIndex === currentMissionIndex) {
-      // progress to next
+  card.innerHTML=`<div class="q-text">📖 Clique sur les <strong>verbes au passé composé</strong> dans le texte.</div>`;
+  const textDiv=document.createElement('div');
+  textDiv.className='click-text';
+
+  step.text_parts.forEach(part=>{
+    if(!part.clk && !part.pp){
+      const sp=document.createElement('span');
+      sp.textContent=part.word;
+      textDiv.appendChild(sp);
+    } else {
+      const sp=document.createElement('span');
+      sp.className='clickable-word';
+      sp.textContent=part.word;
+
+      if(part.pp_whole){
+        sp.onclick=()=>{
+          if(foundGroups.has(part.gid)) return;
+          foundGroups.add(part.gid);
+          foundCount++;
+          // highlight all same gid
+          textDiv.querySelectorAll(`[data-gid="${part.gid}"]`).forEach(el=>el.classList.add('found-pp'));
+          sp.classList.add('found-pp');
+          if(foundCount>=totalGroups){
+            G.tempCorrect++;
+            showFeedback(true,'Tu as trouvé tous les passés composés ! Incroyable ! 🌟');
+            showNext();
+          } else {
+            showFeedback(true,`Bien vu ! Il en reste encore...`);
+          }
+        };
+        sp.dataset.gid=part.gid;
+      } else if(part.clk){
+        sp.onclick=()=>{
+          sp.classList.add('wrong-click');
+          showFeedback(false,`"${part.word}" est à l'${part.tense}. Ce n'est pas un passé composé !`);
+          setTimeout(()=>sp.classList.remove('wrong-click'),600);
+        };
+      }
+      textDiv.appendChild(sp);
+    }
+  });
+
+  const hint=document.createElement('div');
+  hint.className='click-hint';
+  hint.textContent=`Cherche les formes "auxiliaire + participe passé". Clique sur le participe passé !`;
+  card.appendChild(textDiv);
+  card.appendChild(hint);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SPEED
+═══════════════════════════════════════════════════════════════ */
+let speedState={verbs:[],idx:0,correct:0,timer:null,timeLeft:0};
+
+function renderSpeed(card,step){
+  const verbs=[...step.verbs].sort(()=>Math.random()-.5);
+  speedState={verbs,idx:0,correct:0,timer:null};
+
+  card.innerHTML=`
+    <div class="speed-arena">
+      <div class="speed-score" id="speed-score">0 / ${verbs.length}</div>
+      <div class="speed-timer"><div class="speed-timer-fill" id="speed-timer-fill" style="width:100%"></div></div>
+      <div class="speed-verb" id="speed-verb">${verbs[0].v}</div>
+      <div class="speed-btns">
+        <button class="speed-btn etre" onclick="handleSpeed('être')">🏠 ÊTRE</button>
+        <button class="speed-btn avoir" onclick="handleSpeed('avoir')">✅ AVOIR</button>
+      </div>
+      <div id="speed-result" style="font-size:.8rem;color:var(--muted);min-height:1.2rem;"></div>
+    </div>`;
+
+  startSpeedTimer();
+}
+
+function startSpeedTimer(){
+  speedState.timeLeft=100;
+  clearInterval(speedState.timer);
+  speedState.timer=setInterval(()=>{
+    speedState.timeLeft-=2;
+    const fill=document.getElementById('speed-timer-fill');
+    if(fill) fill.style.width=speedState.timeLeft+'%';
+    if(speedState.timeLeft<=20 && fill) fill.style.background='var(--red)';
+    if(speedState.timeLeft<=0){
+      clearInterval(speedState.timer);
+      handleSpeed('timeout');
+    }
+  },100);
+}
+
+function handleSpeed(chosen){
+  clearInterval(speedState.timer);
+  const v=speedState.verbs[speedState.idx];
+  const ok=chosen===v.aux;
+  const res=document.getElementById('speed-result');
+  const btns=document.querySelectorAll('.speed-btn');
+
+  if(chosen!=='timeout'){
+    btns.forEach(b=>{ if(b.textContent.toLowerCase().includes(chosen.split('')[0])){ b.classList.add(ok?'correct-flash':'wrong-flash'); } });
+    if(ok){ speedState.correct++; if(res) res.textContent=`✅ "${v.v}" → ${v.aux}`; }
+    else { if(res) res.textContent=`❌ "${v.v}" → ${v.aux} !`; }
+  } else {
+    if(res) res.textContent=`⏱️ Temps dépassé ! "${v.v}" → ${v.aux}`;
+  }
+
+  setTimeout(()=>{
+    btns.forEach(b=>b.classList.remove('correct-flash','wrong-flash'));
+    speedState.idx++;
+    if(speedState.idx>=speedState.verbs.length){
+      G.tempCorrect++;
+      showFeedback(true,`${speedState.correct} / ${speedState.verbs.length} bons réflexes ! 🌟`);
+      showNext();
+      const vv=document.getElementById('speed-verb');
+      if(vv) vv.textContent='Terminé !';
+    } else {
+      const vv=document.getElementById('speed-verb');
+      if(vv) vv.textContent=speedState.verbs[speedState.idx].v;
+      const sc=document.getElementById('speed-score');
+      if(sc) sc.textContent=`${speedState.correct} / ${speedState.verbs.length}`;
+      const fill=document.getElementById('speed-timer-fill');
+      if(fill){ fill.style.width='100%'; fill.style.background=''; }
+      startSpeedTimer();
+    }
+  },900);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BOXES (drag & drop)
+═══════════════════════════════════════════════════════════════ */
+let boxesData={verbs:[],placed:{}};
+
+function renderBoxes(card,step){
+  boxesData.verbs=step.verbs;
+  boxesData.placed={};
+
+  const shuffled=[...step.verbs].sort(()=>Math.random()-.5);
+  card.innerHTML=`
+    <div class="q-text">📦 Glisse chaque verbe dans la bonne boîte.</div>
+    <div class="boxes-area">
+      <div class="verbs-pool" id="verbs-pool">
+        ${shuffled.map(v=>`<div class="verb-chip" draggable="true" id="chip-${v.v}" data-v="${v.v}">${v.v}</div>`).join('')}
+      </div>
+      <div class="boxes-row">
+        <div class="drop-box etre-box" id="box-être">
+          <h4>🏠 ÊTRE</h4>
+        </div>
+        <div class="drop-box avoir-box" id="box-avoir">
+          <h4>✅ AVOIR</h4>
+        </div>
+      </div>
+      <button class="btn btn-blue btn-sm" onclick="validateBoxes()" style="align-self:center;margin-top:.5rem;">Valider ✓</button>
+    </div>`;
+
+  // drag events
+  card.querySelectorAll('.verb-chip').forEach(chip=>{
+    chip.addEventListener('dragstart',e=>{
+      e.dataTransfer.setData('text',chip.dataset.v);
+      chip.classList.add('dragging');
+    });
+    chip.addEventListener('dragend',()=>chip.classList.remove('dragging'));
+    // click to cycle
+    chip.addEventListener('click',()=>cycleChip(chip));
+  });
+
+  ['être','avoir'].forEach(aux=>{
+    const box=document.getElementById(`box-${aux}`);
+    box.addEventListener('dragover',e=>{e.preventDefault();box.classList.add('drag-over');});
+    box.addEventListener('dragleave',()=>box.classList.remove('drag-over'));
+    box.addEventListener('drop',e=>{
+      e.preventDefault();
+      box.classList.remove('drag-over');
+      const v=e.dataTransfer.getData('text');
+      placeInBox(v,aux);
+    });
+  });
+}
+
+function cycleChip(chip){
+  const v=chip.dataset.v;
+  const pool=document.getElementById('verbs-pool');
+  if(pool.contains(chip)){
+    placeInBox(v,'être');
+  } else {
+    const curBox=boxesData.placed[v];
+    if(curBox==='être') placeInBox(v,'avoir');
+    else { // return to pool
+      delete boxesData.placed[v];
+      const newChip=chip.cloneNode(true);
+      newChip.className='verb-chip';
+      newChip.addEventListener('click',()=>cycleChip(newChip));
+      newChip.draggable=true;
+      newChip.addEventListener('dragstart',e=>{e.dataTransfer.setData('text',v);newChip.classList.add('dragging');});
+      newChip.addEventListener('dragend',()=>newChip.classList.remove('dragging'));
+      chip.remove();
+      pool.appendChild(newChip);
     }
   }
-
-  showVictory(mission, stars, total);
 }
 
-// ============================================================
-//  VICTORY SPLASH
-// ============================================================
-function showVictory(mission, stars, total) {
-  const splash = document.getElementById('victory-splash');
-  document.getElementById('victory-title').textContent = stars >= 3 ? 'Mission accomplie !' : stars >= 2 ? 'Bien joué !' : 'Continue à t\'entraîner !';
-  document.getElementById('victory-sub').textContent = `${tempStars} bonne${tempStars>1?'s':''} réponse${tempStars>1?'s':''} sur ${total}`;
-  const vs = document.getElementById('victory-stars');
-  vs.innerHTML = '';
-  for(let i=0;i<3;i++) {
-    const s = document.createElement('span');
-    s.className = 'star-icon ' + (i < stars ? 'earned' : 'empty');
-    s.style.fontSize = '2rem';
-    s.textContent = '⭐';
+function placeInBox(v,aux){
+  boxesData.placed[v]=aux;
+  // move chip
+  const chip=document.getElementById(`chip-${v}`)||document.querySelector(`[data-v="${v}"]`);
+  if(!chip) return;
+  const box=document.getElementById(`box-${aux}`);
+  const newChip=chip.cloneNode(true);
+  newChip.className='verb-chip';
+  newChip.style.cursor='pointer';
+  newChip.addEventListener('click',()=>cycleChip(newChip));
+  chip.remove();
+  box.appendChild(newChip);
+}
+
+function validateBoxes(){
+  let errors=0;
+  const all=document.querySelectorAll('.drop-box .verb-chip, #box-être .verb-chip, #box-avoir .verb-chip');
+  const boxEtre=document.getElementById('box-être');
+  const boxAvoir=document.getElementById('box-avoir');
+
+  // check placed
+  boxesData.verbs.forEach(({v,aux})=>{
+    const placed=boxesData.placed[v];
+    const chip=document.querySelector(`[data-v="${v}"]`);
+    if(!placed){
+      errors++;
+    } else if(placed!==aux){
+      if(chip) chip.style.cssText+='border-color:var(--red);color:var(--red);';
+      errors++;
+    } else {
+      if(chip) chip.style.cssText+='border-color:var(--green);color:var(--green);';
+    }
+  });
+
+  if(errors===0){
+    G.tempCorrect++;
+    showFeedback(true,'Parfait ! Tous les verbes sont dans la bonne boîte ! 🌟');
+    document.querySelectorAll('.verb-chip').forEach(c=>c.style.pointerEvents='none');
+    showNext();
+  } else {
+    showFeedback(false,`Il y a ${errors} erreur${errors>1?'s':''}. Les verbes en rouge sont mal placés, corrige-les !`);
+    // re-enable correct ones
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LETTER (texte à trous)
+═══════════════════════════════════════════════════════════════ */
+function renderLetter(card,step){
+  // parse letter: [réponse|infinitif] markers
+  let letterHtml=step.letter;
+  let idx=0;
+  const answers=[];
+  letterHtml=letterHtml.replace(/\[([^\|]+)\|([^\]]+)\]/g,(match,ans,inf)=>{
+    answers.push({ans:ans.trim().toLowerCase(),inf:inf.trim(),idx});
+    const id=`lb-${idx}`;
+    idx++;
+    return `<input class="letter-blank" id="${id}" type="text" placeholder="…" autocomplete="off" autocorrect="off" spellcheck="false" style="width:${Math.max(ans.length*12,80)}px;" data-ans="${ans.toLowerCase()}" data-inf="${inf}">`;
+  });
+
+  card.innerHTML=`
+    <div class="q-text">💌 Aide Meï à compléter sa lettre. Conjugue les verbes entre parenthèses au passé composé !</div>
+    <div class="letter-wrap">${letterHtml}</div>
+    <div style="margin-top:.8rem;font-size:.8rem;color:var(--muted);">Infinitifs à conjuguer : ${answers.map(a=>'<strong>'+a.inf+'</strong>').join(', ')}</div>
+    <button class="btn btn-blue btn-sm" onclick="validateLetter()" style="margin-top:1rem;">Meï vérifie sa lettre ✓</button>`;
+}
+
+function validateLetter(){
+  const inputs=document.querySelectorAll('.letter-blank');
+  let errors=0;
+  inputs.forEach(inp=>{
+    const val=inp.value.trim().toLowerCase().replace(/['']/g,"'");
+    const ans=inp.dataset.ans;
+    if(val===ans){
+      inp.classList.add('ok'); inp.classList.remove('ko');
+    } else {
+      inp.classList.add('ko'); inp.classList.remove('ok');
+      errors++;
+    }
+  });
+  if(errors===0){
+    G.tempCorrect++;
+    showFeedback(true,'Parfait ! Meï peut envoyer sa lettre ! 💙🌟');
+    showNext();
+  } else {
+    showFeedback(false,`Meï dit : "Il y a ${errors} erreur${errors>1?'s':''} dans ma lettre… Aide-moi à corriger !"`)
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FILL WITH HELP
+═══════════════════════════════════════════════════════════════ */
+function renderFillHelp(card,step){
+  card.innerHTML=`
+    <div class="q-text">✏️ ${step.q}</div>
+    <div class="lesson-box" style="font-size:.8rem;">💡 Rappel : <strong>${step.hint_pre}</strong> + <em>[auxiliaire]</em> + <em>[participe passé]</em> → <strong>${step.full}</strong></div>
+    <div class="fill-row">
+      <span class="fill-txt">${step.hint_pre}</span>
+      <input class="fill-input" id="fi-main" type="text" placeholder="…" autocomplete="off" autocorrect="off" spellcheck="false"
+        onkeydown="if(event.key==='Enter') validateFillHelp()">
+      <span class="fill-txt">${step.hint_post||''}</span>
+    </div>
+    <div style="font-size:.78rem;color:var(--muted);margin-bottom:.8rem;">Tape uniquement la partie conjuguée (ex: <em>a tiré</em>)</div>
+    <button class="btn btn-blue btn-sm" onclick="validateFillHelp()">Valider ✓</button>`;
+  setTimeout(()=>{ const i=document.getElementById('fi-main'); if(i) i.focus(); },100);
+}
+
+function validateFillHelp(){
+  const inp=document.getElementById('fi-main');
+  if(!inp) return;
+  const val=inp.value.trim().toLowerCase().replace(/['']/g,"'");
+  const m=getMissions()[G.currentMission];
+  const step=m.steps[G.currentStep];
+  const ok=val===step.answer.toLowerCase();
+  inp.classList.add(ok?'ok':'ko');
+  inp.disabled=true;
+  if(!ok){
+    const hint=document.createElement('div');
+    hint.style.cssText='font-size:.82rem;color:var(--muted);margin-top:6px;';
+    hint.textContent=`✓ Réponse attendue : ${step.answer}`;
+    inp.parentNode.appendChild(hint);
+  }
+  if(ok) G.tempCorrect++;
+  showFeedback(ok,step.feedback);
+  showNext();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FEEDBACK / NEXT
+═══════════════════════════════════════════════════════════════ */
+function showFeedback(ok,msg){
+  const fb=document.getElementById('feedback');
+  fb.className='feedback '+(ok?'ok':'ko');
+  fb.textContent=(ok?'✅ ':'❌ ')+msg;
+  fb.style.display='block';
+}
+function hideFeedback(){ document.getElementById('feedback').style.display='none'; }
+function showNext(){ document.getElementById('btn-next').style.display='flex'; }
+function hideNext(){ document.getElementById('btn-next').style.display='none'; }
+
+function nextStep(){
+  clearInterval(speedState.timer);
+  G.currentStep++;
+  updateProgress();
+  const m=getMissions()[G.currentMission];
+  if(G.currentStep>=m.steps.length){
+    endMission();
+  } else {
+    renderStep();
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   END MISSION / VICTORY
+═══════════════════════════════════════════════════════════════ */
+function endMission(){
+  const total=getMissions()[G.currentMission].steps.length;
+  const pct=G.tempCorrect/total;
+  const stars=pct>=.85?3:pct>=.6?2:1;
+  G.missionStars[G.currentMission]=Math.max(G.missionStars[G.currentMission]||0,stars);
+
+  // advance pointer
+  const MISSIONS=getMissions();
+  if(G.currentMission<MISSIONS.length-1 && G.missionStars[G.currentMission]>0){
+    G.currentMission=Math.max(G.currentMission,G.currentMission+1);
+    // set to next unlocked
+    let next=0;
+    for(let i=0;i<G.missionStars.length;i++){
+      if(G.missionStars[i]===0){ next=i; break; }
+    }
+    G.currentMission=Math.min(next,MISSIONS.length-1);
+  }
+
+  const messages=['','Bien essayé ! Continue !','Bien joué !','Mission accomplie !'];
+  document.getElementById('v-title').textContent=messages[stars]||'Bravo !';
+  document.getElementById('v-sub').textContent=`${G.tempCorrect} exercice${G.tempCorrect>1?'s':''} réussi${G.tempCorrect>1?'s':''}`;
+  const vs=document.getElementById('v-stars');
+  vs.innerHTML='';
+  for(let i=0;i<3;i++){
+    const s=document.createElement('span');
+    s.textContent='⭐';
+    s.style.opacity=i<stars?'1':'0.2';
     vs.appendChild(s);
   }
-  splash.classList.add('show');
-  if(stars >= 2) launchConfetti();
+  document.getElementById('victory-overlay').classList.add('show');
+  if(stars>=2) launchConfetti();
 }
 
-function closeVictory() {
-  document.getElementById('victory-splash').classList.remove('show');
-  const missions = getMissions(playerName);
-
-  // Advance if needed
-  if(missionStars[currentMissionIndex] > 0 && currentMissionIndex < missions.length - 1) {
-    currentMissionIndex++;
-  }
-
-  // Check if all done
-  const allDone = missionStars.slice(0, missions.length).every(s => s > 0);
-  if(allDone) {
-    showEndScreen();
-  } else {
-    showMap();
-  }
+function closeVictory(){
+  document.getElementById('victory-overlay').classList.remove('show');
+  const MISSIONS=getMissions();
+  const allDone=MISSIONS.every((_,i)=>G.missionStars[i]>0);
+  if(allDone) showEndScreen();
+  else goToMissions();
 }
 
-// ============================================================
-//  END SCREEN
-// ============================================================
-function showEndScreen() {
+/* ═══════════════════════════════════════════════════════════════
+   END SCREEN
+═══════════════════════════════════════════════════════════════ */
+function showEndScreen(){
+  const total=G.missionStars.reduce((a,b)=>a+b,0);
+  const max=getMissions().length*3;
   showPage('page-end');
-  const total = missionStars.reduce((a,b) => a+b, 0);
-  document.getElementById('end-score-text').innerHTML = `${playerName} a remporté <span>${total}</span> étoile${total>1?'s':''} sur 30 !`;
-  document.getElementById('end-story').innerHTML = `
-    <p>🏆 <strong>Incroyable, ${playerName} !</strong> Tu as guidé les Snow Kids jusqu'à la Galactik Football Cup !</p>
-    <p>Aarch te soulève dans les bras : "Je savais que tu étais le/la meilleur(e) joueur(se) de la galaxie ! Ton Souffle de la conjugaison est sans égal !"</p>
-    <p>D'Jok, Tia, Micro-Ice, Rocket, Ahito, Thran et Meï crient ton nom dans le stade !</p>
-    <p style="margin-top:0.5rem; font-size:0.85rem; color:var(--text-muted);">🌟 Rappel de ta leçon : verbes 1er groupe → participe passé en -<strong>É</strong> | Avec AVOIR : pas d'accord ! | Avec ÊTRE : on accorde.</p>
-  `;
+  document.getElementById('end-score').innerHTML=`${G.name} a remporté <strong style="color:var(--gold);font-size:1.3rem;">${total}</strong> étoile${total>1?'s':''} sur ${max} !`;
+  document.getElementById('end-story').innerHTML=`
+    <p>🏆 <strong>Incroyable, ${G.name} !</strong> Tu as guidé les Snow Kids jusqu'à la Galactik Football Cup !</p>
+    <p style="margin-top:.6rem;">Aarch te soulève : <em>"Je savais que tu étais le/la meilleur(e) joueur(se) de la galaxie ! Ton Souffle de la conjugaison est sans égal !"</em></p>
+    <p style="margin-top:.6rem;">D'Jok, Tia, Micro-Ice, Rocket, Ahito, Thran et Meï crient ton prénom dans tout le stade !</p>
+    <p style="margin-top:.8rem;font-size:.82rem;color:var(--muted);">📚 Rappel : verbes 1er groupe → pp en <strong>-É</strong> | Avec AVOIR : pas d'accord ! | Avec ÊTRE : accord en genre et nombre.</p>`;
   launchConfetti();
 }
 
-function replayGame() {
-  missionStars = new Array(10).fill(0);
-  totalStars = 0;
-  currentMissionIndex = 0;
-  showPage('page-intro');
+function replayGame(){
+  G.missionStars=new Array(30).fill(0);
+  G.currentMission=0;
+  MISSIONS_CACHE=null;
+  showPage('page-home');
 }
 
-// ============================================================
-//  CONFETTI
-// ============================================================
-function launchConfetti() {
-  const colors = ['#ffd93d','#4da6ff','#2ecc71','#ff4455','#8b5cf6','#ff9f43'];
-  for(let i=0;i<60;i++){
-    const c = document.createElement('div');
-    c.className = 'confetti-piece';
-    c.style.cssText = `left:${Math.random()*100}vw;top:-10px;background:${colors[Math.floor(Math.random()*colors.length)]};animation-delay:${Math.random()*2}s;animation-duration:${2+Math.random()*2}s;transform:rotate(${Math.random()*360}deg);`;
+/* ═══════════════════════════════════════════════════════════════
+   CONFETTI
+═══════════════════════════════════════════════════════════════ */
+function launchConfetti(){
+  const colors=['#ffd93d','#4da6ff','#2ecc71','#ff3b4e','#8b5cf6','#ff9f43','#00cec9'];
+  for(let i=0;i<70;i++){
+    const c=document.createElement('div');
+    c.className='confetti';
+    c.style.cssText=`left:${Math.random()*100}vw;top:-10px;background:${colors[Math.floor(Math.random()*colors.length)]};animation-delay:${Math.random()*2}s;animation-duration:${2.5+Math.random()*2}s;transform:rotate(${Math.random()*360}deg);width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;`;
     document.body.appendChild(c);
-    setTimeout(() => c.remove(), 5000);
+    setTimeout(()=>c.remove(),5000);
   }
 }
 
-// ============================================================
-//  ENTER KEY on name input
-// ============================================================
-document.getElementById('player-name').addEventListener('keydown', e => {
-  if(e.key === 'Enter') startGame();
-});
+/* ═══════════════════════════════════════════════════════════════
+   ENTER KEY
+═══════════════════════════════════════════════════════════════ */
+document.getElementById('player-name').addEventListener('keydown',e=>{if(e.key==='Enter')launchIntro();});
 </script>
 </body>
 </html>
