@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galactik Football — Mission Conjugaison</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --snow: #e8f4ff;
+    --blue-deep: #0a1628;
+    --blue-mid: #0d2a5c;
+    --blue-bright: #1a6ef5;
+    --blue-glow: #4da6ff;
+    --gold: #ffd93d;
+    --gold-dark: #e6b800;
+    --red: #ff4455;
+    --green-ok: #2ecc71;
+    --purple: #8b5cf6;
+    --text-main: #e8f4ff;
+    --text-muted: #8ab3d4;
+    --panel: rgba(13,42,92,0.85);
+    --panel-border: rgba(77,166,255,0.25);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--blue-deep);
+    color: var(--text-main);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ===== STARFIELD ===== */
+  #starfield {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background: radial-gradient(ellipse at 20% 50%, #0d1a3a 0%, #050c1a 100%);
+  }
+  .star {
+    position: absolute; border-radius: 50%;
+    background: white; animation: twinkle 3s infinite alternate;
+  }
+  @keyframes twinkle { from { opacity: 0.2; } to { opacity: 1; } }
+
+  /* ===== PAGES ===== */
+  .page { position: relative; z-index: 1; min-height: 100vh; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 1rem; }
+  .page.active { display: flex; }
+
+  /* ===== INTRO ===== */
+  #page-intro { text-align: center; }
+  .logo-gf {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1.8rem, 5vw, 3.5rem);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    color: var(--gold);
+    text-shadow: 0 0 30px rgba(255,217,61,0.6), 0 0 60px rgba(255,217,61,0.2);
+    animation: pulse-gold 2.5s ease-in-out infinite;
+    line-height: 1.1;
+  }
+  @keyframes pulse-gold { 0%,100% { text-shadow: 0 0 30px rgba(255,217,61,0.6); } 50% { text-shadow: 0 0 60px rgba(255,217,61,1), 0 0 100px rgba(255,217,61,0.4); } }
+  .subtitle-intro {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(0.7rem, 2vw, 1rem);
+    letter-spacing: 0.3em;
+    color: var(--blue-glow);
+    text-transform: uppercase;
+    margin: 0.4rem 0 2rem;
+  }
+
+  .story-box {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    max-width: 680px;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--snow);
+    margin: 1.5rem 0;
+    text-align: left;
+    backdrop-filter: blur(10px);
+  }
+  .story-box p { margin-bottom: 0.8rem; }
+  .story-box p:last-child { margin-bottom: 0; }
+  .highlight-name { color: var(--gold); font-weight: 700; }
+
+  .name-input-wrap { margin: 1.5rem 0; display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
+  .name-input-wrap label { font-family: 'Orbitron', monospace; font-size: 0.85rem; color: var(--blue-glow); letter-spacing: 0.1em; }
+  .name-input {
+    background: rgba(13,42,92,0.8);
+    border: 2px solid var(--blue-bright);
+    border-radius: 10px;
+    padding: 0.7rem 1.2rem;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--gold);
+    text-align: center;
+    width: 260px;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .name-input:focus { border-color: var(--gold); box-shadow: 0 0 20px rgba(255,217,61,0.3); }
+
+  /* ===== BTN ===== */
+  .btn {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn-gold {
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    color: var(--blue-deep);
+    box-shadow: 0 4px 20px rgba(255,217,61,0.4);
+  }
+  .btn-gold:hover { box-shadow: 0 6px 30px rgba(255,217,61,0.6); transform: translateY(-2px); }
+  .btn-blue {
+    background: linear-gradient(135deg, var(--blue-bright), #0f4db5);
+    color: white;
+    box-shadow: 0 4px 20px rgba(26,110,245,0.4);
+  }
+  .btn-blue:hover { box-shadow: 0 6px 30px rgba(26,110,245,0.6); transform: translateY(-2px); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--panel-border);
+  }
+  .btn-ghost:hover { color: var(--snow); border-color: var(--blue-glow); }
+  .btn-sm { font-size: 0.75rem; padding: 0.5rem 1.2rem; }
+
+  /* ===== MAP / BOARD ===== */
+  #page-map { padding: 1.5rem 1rem; justify-content: flex-start; }
+  .map-header { text-align: center; margin-bottom: 1.5rem; width: 100%; }
+  .map-header h2 { font-family: 'Orbitron', monospace; font-size: 1.3rem; color: var(--gold); }
+  .map-header p { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.3rem; }
+
+  .board-container { width: 100%; max-width: 760px; position: relative; }
+  .board-track {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    justify-content: center; padding: 1rem;
+  }
+
+  .cell {
+    width: 80px; height: 80px;
+    border-radius: 12px;
+    border: 2px solid var(--panel-border);
+    background: var(--panel);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; position: relative;
+    transition: all 0.25s;
+    font-size: 0.65rem; text-align: center;
+    color: var(--text-muted);
+    backdrop-filter: blur(4px);
+  }
+  .cell:hover { border-color: var(--blue-glow); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(77,166,255,0.2); }
+  .cell.completed { border-color: var(--green-ok); background: rgba(46,204,113,0.15); }
+  .cell.current { border-color: var(--gold); background: rgba(255,217,61,0.1); animation: cell-pulse 1.5s ease-in-out infinite; }
+  .cell.locked { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+  .cell.start { border-color: var(--blue-glow); background: rgba(77,166,255,0.1); }
+  .cell.finish { border-color: var(--gold); background: rgba(255,217,61,0.15); }
+  @keyframes cell-pulse { 0%,100% { box-shadow: 0 0 10px rgba(255,217,61,0.3); } 50% { box-shadow: 0 0 30px rgba(255,217,61,0.7); } }
+
+  .cell-num { font-family: 'Orbitron', monospace; font-size: 0.7rem; font-weight: 700; color: var(--blue-glow); }
+  .cell-icon { font-size: 1.4rem; margin: 2px 0; }
+  .cell-label { font-size: 0.6rem; color: var(--text-muted); line-height: 1.2; padding: 0 4px; }
+
+  .player-token {
+    position: absolute; top: -10px; right: -10px;
+    width: 26px; height: 26px;
+    background: var(--gold);
+    border-radius: 50%;
+    border: 2px solid var(--blue-deep);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 700;
+    color: var(--blue-deep);
+    z-index: 2;
+    animation: bounce-token 0.6s ease-in-out;
+  }
+  @keyframes bounce-token { 0%,100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+
+  /* Stars display */
+  .stars-bar { display: flex; align-items: center; gap: 6px; margin-top: 0.8rem; }
+  .star-icon { font-size: 1.2rem; transition: all 0.3s; }
+  .star-icon.earned { color: var(--gold); text-shadow: 0 0 10px rgba(255,217,61,0.6); }
+  .star-icon.empty { color: #334; }
+
+  /* ===== EXERCISE PAGE ===== */
+  #page-exercise { padding: 1rem; justify-content: flex-start; min-height: 100vh; }
+
+  .ex-header {
+    width: 100%; max-width: 680px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    background: var(--panel); border-radius: 12px;
+    border: 1px solid var(--panel-border);
+  }
+  .ex-breadcrumb { font-family: 'Orbitron', monospace; font-size: 0.75rem; color: var(--blue-glow); }
+  .ex-stars { display: flex; gap: 4px; }
+
+  .mission-card {
+    width: 100%; max-width: 680px;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 20px;
+    padding: 1.5rem;
+    backdrop-filter: blur(10px);
+    margin-bottom: 1rem;
+  }
+  .mission-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(26,110,245,0.2);
+    border: 1px solid rgba(26,110,245,0.4);
+    border-radius: 50px;
+    padding: 4px 12px;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    color: var(--blue-glow);
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+  }
+  .mission-story {
+    font-size: 1rem; line-height: 1.7;
+    color: var(--snow);
+    margin-bottom: 1.2rem;
+    padding: 1rem;
+    background: rgba(0,0,0,0.2);
+    border-radius: 10px;
+    border-left: 3px solid var(--blue-glow);
+  }
+  .mission-question {
+    font-size: 1.05rem; font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+
+  /* Exercise types */
+  .choices-grid { display: flex; flex-direction: column; gap: 10px; }
+  .choice-btn {
+    background: rgba(13,42,92,0.7);
+    border: 2px solid var(--panel-border);
+    border-radius: 12px;
+    padding: 0.75rem 1.2rem;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem; font-weight: 600;
+    color: var(--snow);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+  }
+  .choice-btn:hover { border-color: var(--blue-glow); background: rgba(77,166,255,0.1); }
+  .choice-btn.correct { border-color: var(--green-ok); background: rgba(46,204,113,0.2); color: var(--green-ok); }
+  .choice-btn.wrong { border-color: var(--red); background: rgba(255,68,85,0.15); color: var(--red); }
+  .choice-btn:disabled { cursor: default; }
+
+  .fill-wrap { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .fill-input {
+    background: rgba(13,42,92,0.8);
+    border: 2px solid var(--blue-bright);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem; font-weight: 700;
+    color: var(--gold);
+    outline: none;
+    min-width: 120px;
+    max-width: 200px;
+    transition: all 0.2s;
+  }
+  .fill-input:focus { border-color: var(--gold); box-shadow: 0 0 15px rgba(255,217,61,0.2); }
+  .fill-input.correct { border-color: var(--green-ok); color: var(--green-ok); }
+  .fill-input.wrong { border-color: var(--red); color: var(--red); }
+
+  /* Lesson box */
+  .lesson-box {
+    background: rgba(139,92,246,0.1);
+    border: 1px solid rgba(139,92,246,0.3);
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: #c4b5fd;
+    line-height: 1.6;
+  }
+  .lesson-box strong { color: #a78bfa; }
+
+  /* Feedback */
+  .feedback-banner {
+    width: 100%; max-width: 680px;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    font-size: 1rem; font-weight: 700;
+    text-align: center;
+    display: none;
+    margin-bottom: 1rem;
+    animation: slide-up 0.3s ease;
+  }
+  @keyframes slide-up { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+  .feedback-banner.correct { background: rgba(46,204,113,0.2); border: 1px solid var(--green-ok); color: var(--green-ok); }
+  .feedback-banner.wrong { background: rgba(255,68,85,0.15); border: 1px solid var(--red); color: var(--red); }
+
+  /* ===== VICTORY SPLASH ===== */
+  .victory-splash {
+    display: none; position: fixed; inset: 0; z-index: 100;
+    background: rgba(5,12,26,0.95);
+    flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+  }
+  .victory-splash.show { display: flex; }
+  .trophy { font-size: 5rem; animation: trophy-bounce 0.8s ease; }
+  @keyframes trophy-bounce { 0% { transform: scale(0) rotate(-20deg); } 70% { transform: scale(1.2) rotate(5deg); } 100% { transform: scale(1) rotate(0); } }
+  .victory-title { font-family: 'Orbitron', monospace; font-size: 2rem; color: var(--gold); margin: 1rem 0 0.3rem; text-shadow: 0 0 40px rgba(255,217,61,0.6); }
+  .victory-sub { color: var(--text-muted); font-size: 1rem; margin-bottom: 1.5rem; }
+  .confetti-piece {
+    position: fixed; width: 10px; height: 10px;
+    border-radius: 2px; animation: fall 3s linear forwards;
+    pointer-events: none;
+  }
+  @keyframes fall {
+    from { opacity:1; transform: translateY(-50px) rotate(0deg); }
+    to { opacity:0; transform: translateY(110vh) rotate(720deg); }
+  }
+
+  /* ===== PROGRESS BAR ===== */
+  .progress-wrap { width: 100%; max-width: 680px; margin-bottom: 1rem; }
+  .progress-track { height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--blue-bright), var(--blue-glow)); border-radius: 3px; transition: width 0.5s ease; }
+  .progress-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; text-align: right; font-family: 'Orbitron', monospace; }
+
+  /* ===== END SCREEN ===== */
+  #page-end { text-align: center; }
+  .cup-img { font-size: 6rem; animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+  .end-title { font-family: 'Orbitron', monospace; font-size: 2.5rem; color: var(--gold); text-shadow: 0 0 40px rgba(255,217,61,0.5); margin: 1rem 0 0.5rem; }
+  .end-score { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 2rem; }
+  .end-score span { color: var(--gold); font-weight: 700; font-size: 1.5rem; }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 500px) {
+    .cell { width: 65px; height: 65px; }
+    .cell-icon { font-size: 1.1rem; }
+    .logo-gf { font-size: 1.8rem; }
+  }
+
+  /* ===== Animations d'entrée ===== */
+  .fade-in { animation: fadeIn 0.6s ease forwards; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+  /* Type QCM drag & match */
+  .match-pairs { display: flex; gap: 20px; flex-wrap: wrap; }
+  .match-col { flex: 1; min-width: 140px; display: flex; flex-direction: column; gap: 8px; }
+  .match-col h4 { font-family: 'Orbitron', monospace; font-size: 0.7rem; color: var(--blue-glow); margin-bottom: 4px; }
+  .match-item {
+    background: rgba(13,42,92,0.7); border: 2px solid var(--panel-border);
+    border-radius: 10px; padding: 0.5rem 0.8rem;
+    font-size: 0.9rem; cursor: pointer;
+    transition: all 0.2s; text-align: center;
+    font-weight: 600;
+  }
+  .match-item:hover { border-color: var(--blue-glow); }
+  .match-item.selected { border-color: var(--gold); background: rgba(255,217,61,0.1); color: var(--gold); }
+  .match-item.matched { border-color: var(--green-ok); background: rgba(46,204,113,0.15); color: var(--green-ok); pointer-events: none; }
+  .match-item.error { border-color: var(--red); background: rgba(255,68,85,0.15); color: var(--red); }
+
+  .inline-blank {
+    display: inline-block;
+    min-width: 80px; height: 30px;
+    border-bottom: 2px solid var(--blue-glow);
+    color: var(--gold); font-weight: 700;
+    text-align: center; vertical-align: bottom;
+    line-height: 30px; padding: 0 4px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Starfield -->
+<div id="starfield"></div>
+
+<!-- ===== PAGE INTRO ===== -->
+<div class="page active" id="page-intro">
+  <div class="fade-in" style="text-align:center; max-width:680px; width:100%;">
+    <div style="font-size:3rem; margin-bottom:0.5rem;">⚽🌌</div>
+    <div class="logo-gf">GALACTIK FOOTBALL</div>
+    <div class="subtitle-intro">Mission Conjugaison</div>
+
+    <div class="story-box">
+      <p>Dans une galaxie lointaine, les Snow Kids — la légendaire équipe de la planète Akillian — ont besoin d'un <span class="highlight-name">nouveau joueur</span> pour remporter la <span class="highlight-name">Galactik Football Cup</span> !</p>
+      <p>Leur entraîneur <span class="highlight-name">Aarch</span> a lancé un appel dans toute la galaxie : il cherche quelqu'un de courageux, intelligent… et qui maîtrise le Souffle de la conjugaison ! 🌬️</p>
+      <p>Ce joueur extraordinaire, c'est peut-être <strong>toi</strong> !</p>
+    </div>
+
+    <div class="name-input-wrap">
+      <label>✦ Quel est ton prénom, futur Snow Kid ?</label>
+      <input class="name-input" id="player-name" type="text" placeholder="Ton prénom" maxlength="16" autocomplete="off" />
+    </div>
+
+    <button class="btn btn-gold" onclick="startGame()">Rejoindre les Snow Kids ⚡</button>
+  </div>
+</div>
+
+<!-- ===== PAGE MAP ===== -->
+<div class="page" id="page-map">
+  <div class="map-header fade-in">
+    <h2>🗺️ Plateau de Mission</h2>
+    <p id="map-subtitle">Bienvenue, <span id="map-name-display"></span> ! Clique sur ta prochaine mission.</p>
+    <div class="stars-bar" style="justify-content:center; margin-top:0.5rem;">
+      <span style="font-size:0.8rem; color:var(--text-muted); margin-right:4px; font-family:'Orbitron',monospace;">ÉTOILES :</span>
+      <span class="star-icon" id="gs1">⭐</span>
+      <span class="star-icon" id="gs2">⭐</span>
+      <span class="star-icon" id="gs3">⭐</span>
+      <span class="star-icon" id="gs4">⭐</span>
+      <span class="star-icon" id="gs5">⭐</span>
+      <span class="star-icon" id="gs6">⭐</span>
+      <span class="star-icon" id="gs7">⭐</span>
+      <span class="star-icon" id="gs8">⭐</span>
+      <span class="star-icon" id="gs9">⭐</span>
+      <span class="star-icon" id="gs10">⭐</span>
+    </div>
+  </div>
+  <div class="board-container">
+    <div class="board-track" id="board-track"></div>
+  </div>
+</div>
+
+<!-- ===== PAGE EXERCISE ===== -->
+<div class="page" id="page-exercise">
+  <div class="ex-header fade-in">
+    <div class="ex-breadcrumb" id="ex-breadcrumb">Mission 1</div>
+    <div class="ex-stars" id="ex-stars-display"></div>
+    <button class="btn btn-ghost btn-sm" onclick="showMap()">← Carte</button>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="ex-progress-fill" style="width:0%"></div></div>
+    <div class="progress-label" id="ex-progress-label">0 / 0</div>
+  </div>
+  <div id="exercise-area" style="width:100%; max-width:680px;"></div>
+  <div class="feedback-banner" id="feedback-banner"></div>
+  <div style="width:100%; max-width:680px; display:flex; justify-content:flex-end; margin-top:0.5rem;">
+    <button class="btn btn-blue" id="btn-next" onclick="nextQuestion()" style="display:none;">Suite →</button>
+  </div>
+</div>
+
+<!-- ===== PAGE FIN ===== -->
+<div class="page" id="page-end">
+  <div class="fade-in" style="text-align:center; max-width:560px;">
+    <div class="cup-img">🏆</div>
+    <div class="end-title">GALACTIK CHAMPION !</div>
+    <div class="end-score" id="end-score-text"></div>
+    <div class="story-box" id="end-story"></div>
+    <button class="btn btn-gold" onclick="replayGame()" style="margin-top:1.5rem;">Rejouer 🌌</button>
+  </div>
+</div>
+
+<!-- Victory splash -->
+<div class="victory-splash" id="victory-splash">
+  <div class="trophy">🏅</div>
+  <div class="victory-title" id="victory-title">Mission accomplie !</div>
+  <div class="victory-sub" id="victory-sub"></div>
+  <div class="stars-bar" style="justify-content:center; margin-bottom:1.5rem;" id="victory-stars"></div>
+  <button class="btn btn-gold" onclick="closeVictory()">Continuer →</button>
+</div>
+
+<script>
+// ============================================================
+//  STARFIELD
+// ============================================================
+(function(){
+  const sf = document.getElementById('starfield');
+  for(let i=0;i<120;i++){
+    const s = document.createElement('div');
+    s.className='star';
+    const sz = Math.random()*2.5+0.5;
+    s.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*4}s;animation-duration:${2+Math.random()*3}s;`;
+    sf.appendChild(s);
+  }
+})();
+
+// ============================================================
+//  STATE
+// ============================================================
+let playerName = '';
+let currentMissionIndex = 0;
+let currentQuestionIndex = 0;
+let missionStars = [];
+let totalStars = 0;
+let selectedMatchA = null;
+let matchedPairs = 0;
+let tempStars = 0; // stars earned in current mission
+
+// ============================================================
+//  MISSIONS DATA
+// ============================================================
+function getMissions(name) {
+  return [
+    // ── MISSION 1 : infinitif → participe passé (1er groupe) ──
+    {
+      id: 1, title: "Mission 1 : L'Entraînement",
+      icon: '⚽', type: 'lesson+qcm',
+      badge: 'AKILLIAN • RECRUTEMENT',
+      story: `Aarch te fait entrer dans le stade d'Akillian. "Bienvenue, ${name} !", dit-il. "Avant de jouer, il faut apprendre le Souffle de la conjugaison. Le participe passé, c'est notre première arme !"`,
+      lesson: `<strong>Les verbes du 1er groupe</strong> (infinitif en <strong>-ER</strong>) ont un participe passé en <strong>-É</strong>.<br>
+      Exemples : marquer → marqué &nbsp;|&nbsp; tirer → tiré &nbsp;|&nbsp; passer → passé`,
+      questions: [
+        { q: "Quel est le participe passé de « tirer » ?", choices:["tiré","tiru","tirit","tirés"], answer:0, feedback:"Bravo ! tirer → tiré (1er groupe, ça finit en -É !)" },
+        { q: "Quel est le participe passé de « marquer » ?", choices:["marquis","marqu","marqué","marquer"], answer:2, feedback:"Excellent ! marquer → marqué ⚽" },
+        { q: "Quel est le participe passé de « passer » ?", choices:["passé","passis","passit","passur"], answer:0, feedback:"Parfait ! passer → passé. Tu maîtrises le Souffle !" },
+        { q: "Quel est le participe passé de « dribbler » ?", choices:["dribblir","dribblé","dribblu","dribblit"], answer:1, feedback:"Oui ! dribbler → dribblé 🌟" },
+      ]
+    },
+
+    // ── MISSION 2 : participe passé verbes irréguliers ──
+    {
+      id: 2, title: "Mission 2 : Pouvoirs Spéciaux",
+      icon: '🌬️', type: 'qcm',
+      badge: 'AKILLIAN • LE SOUFFLE',
+      story: `Micro-Ice te glisse à l'oreille : "${name}, méfie-toi des verbes irréguliers ! Ils ont des participes passés surprenants. Être → été, avoir → eu, finir → fini, prendre → pris…"`,
+      lesson: `Les autres verbes ont des participes passés en <strong>-i, -is, -it, -t</strong> ou <strong>-u</strong>.<br>
+      Astuce : pense au féminin ! <em>pris → prise</em>, donc <em>pris</em>. <em>fini → finie</em>, donc <em>fini</em>.`,
+      questions: [
+        { q: "Quel est le participe passé de « finir » ?", choices:["finé","finis","fini","finait"], answer:2, feedback:"Oui ! finir → fini. Groupe 2, ça finit en -i !" },
+        { q: "Quel est le participe passé de « prendre » ?", choices:["prendé","pris","prenu","prend"], answer:1, feedback:"Exact ! prendre → pris. Pense à la féminine : prise ✅" },
+        { q: "Quel est le participe passé de « avoir » ?", choices:["avoiré","avi","eu","avé"], answer:2, feedback:"Bravo ! avoir → eu. Verbe irrégulier !" },
+        { q: "Quel est le participe passé de « être » ?", choices:["ésé","étit","étu","été"], answer:3, feedback:"Excellent ! être → été 🌟" },
+      ]
+    },
+
+    // ── MISSION 3 : Reconnaître le passé composé ──
+    {
+      id: 3, title: "Mission 3 : Match contre les Wambas",
+      icon: '🔵', type: 'qcm',
+      badge: 'CUP • TOUR 1 • WAMBAS',
+      story: `Les Snow Kids affrontent les Wambas ! D'Jok crie : "${name}, peux-tu repérer les verbes au passé composé dans mon commentaire de match ?"`,
+      lesson: `Le <strong>passé composé</strong> = auxiliaire (<em>avoir</em> ou <em>être</em>) conjugué + participe passé.<br>
+      Exemples : <em>il a tiré</em> ✔ &nbsp;|&nbsp; <em>il tire</em> ✗ (présent) &nbsp;|&nbsp; <em>il tirait</em> ✗ (imparfait)`,
+      questions: [
+        { q: "Quelle phrase est au passé composé ?", choices:["D'Jok tire le ballon.","D'Jok a tiré le ballon.","D'Jok tirait le ballon.","D'Jok tirera."], answer:1, feedback:"'a tiré' = auxiliaire avoir + participe passé → passé composé ! ✅" },
+        { q: "Quelle phrase est au passé composé ?", choices:["Ahito arrêtait le tir.","Ahito arrête le tir.","Ahito a arrêté le tir.","Ahito arrêtera."], answer:2, feedback:"'a arrêté' → passé composé ! Bravo ! 🧤" },
+        { q: "Laquelle N'est PAS au passé composé ?", choices:["Micro-Ice a dribblé.","Tia a passé le ballon.","Rocket courait vite.","D'Jok a marqué."], answer:2, feedback:"'courait' est à l'imparfait, pas au passé composé !" },
+        { q: "Quelle phrase est au passé composé ?", choices:["Les Snow Kids gagnaient.","Les Snow Kids ont gagné !","Les Snow Kids gagnent !","Les Snow Kids gagneront."], answer:1, feedback:"'ont gagné' → passé composé ! VICTOIRE ! 🏆" },
+      ]
+    },
+
+    // ── MISSION 4 : associer sujet ──
+    {
+      id: 4, title: "Mission 4 : Qui a fait quoi ?",
+      icon: '👤', type: 'qcm',
+      badge: 'CUP • ANALYSE DU JEU',
+      story: `Clamp étudie les statistiques du match. "${name}, aide-moi à retrouver à quelle personne chaque verbe est conjugué !"`,
+      lesson: `Le sujet du verbe nous dit <strong>qui</strong> fait l'action.<br>
+      <em>j'ai joué</em> → 1re pers. sing. &nbsp;|&nbsp; <em>tu as joué</em> → 2e pers. sing. &nbsp;|&nbsp; <em>il a joué</em> → 3e pers. sing.`,
+      questions: [
+        { q: "« J'ai dribblé le gardien. » — À quelle personne ?", choices:["1re pers. singulier","2e pers. singulier","3e pers. singulier","1re pers. pluriel"], answer:0, feedback:"Exact ! J' = je = 1re personne du singulier ✅" },
+        { q: "« Tu as marqué un but incroyable ! » — À quelle personne ?", choices:["1re pers. singulier","2e pers. singulier","3e pers. singulier","3e pers. pluriel"], answer:1, feedback:"Tu = 2e personne du singulier. Bravo !" },
+        { q: "« Tia a passé le ballon à D'Jok. » — À quelle personne ?", choices:["1re pers. singulier","2e pers. singulier","3e pers. singulier","1re pers. pluriel"], answer:2, feedback:"Tia → il/elle = 3e personne du singulier 🌟" },
+        { q: "« Nous avons gagné la Cup ! » — À quelle personne ?", choices:["1re pers. singulier","2e pers. pluriel","3e pers. pluriel","1re pers. pluriel"], answer:3, feedback:"Nous = 1re personne du pluriel. Toute l'équipe a gagné ! 🏆" },
+      ]
+    },
+
+    // ── MISSION 5 : être ou avoir ──
+    {
+      id: 5, title: "Mission 5 : Les Shadows attaquent !",
+      icon: '🌑', type: 'qcm',
+      badge: 'CUP • DEMI-FINALE • SHADOWS',
+      story: `Sinedd et les Shadows arrivent ! Aarch chuchote : "${name}, pour les battre il faut maîtriser l'auxiliaire. Être ou avoir, voilà la clé !"`,
+      lesson: `<strong>AVOIR</strong> → la plupart des verbes : <em>il a couru, elle a mangé, j'ai joué…</em><br>
+      <strong>ÊTRE</strong> → les verbes de déplacement/état + tous les verbes pronominaux : aller, venir, partir, arriver, entrer, sortir, naître, mourir, rester, tomber, monter, descendre, passer, retourner.<br>
+      Astuce : <em>"La maison d'être"</em> 🏠`,
+      questions: [
+        { q: "« D'Jok ___ marqué un but. » — Quel auxiliaire ?", choices:["est","a"], answer:1, feedback:"AVOIR ! 'marquer' n'est pas un verbe de déplacement. Pas de danger avec avoir ! ✅" },
+        { q: "« Rocket ___ arrivé en retard. » — Quel auxiliaire ?", choices:["est","a"], answer:0, feedback:"ÊTRE ! 'arriver' est un verbe de déplacement → auxiliaire être 🏠" },
+        { q: "« Les Snow Kids ___ gagné ! » — Quel auxiliaire ?", choices:["sont","ont"], answer:1, feedback:"AVOIR ! gagner → auxiliaire avoir. Pas d'accord ! ✅" },
+        { q: "« Tia ___ partie avant le match. » — Quel auxiliaire ?", choices:["est","a"], answer:0, feedback:"ÊTRE ! 'partir' est dans la maison d'être 🏠" },
+        { q: "« Micro-Ice ___ dribblé trois joueurs. » — Quel auxiliaire ?", choices:["est","a"], answer:1, feedback:"AVOIR ! dribbler → avoir. Facile avec avoir ! ✅" },
+      ]
+    },
+
+    // ── MISSION 6 : conjuguer au passé composé ──
+    {
+      id: 6, title: "Mission 6 : Le Grand Match",
+      icon: '🌟', type: 'fill',
+      badge: 'CUP • FINALE • GALACTIK STADIUM',
+      story: `C'est la finale de la Galactik Football Cup ! ${name}, tu es sur le terrain avec les Snow Kids. Conjugue ces verbes au passé composé pour activer le Souffle !`,
+      lesson: `Rappel : auxiliaire conjugué au <strong>présent</strong> + <strong>participe passé</strong>.<br>
+      <em>je joue → j'<strong>ai joué</strong></em> &nbsp;|&nbsp; <em>il joue → il <strong>a joué</strong></em>`,
+      questions: [
+        { pre:"Micro-Ice", verb:"marquer", person:"il", q:`Conjugue "marquer" au passé composé à la 3e personne du singulier :`, answer:"a marqué", hint:"il ___ marqué", feedback:"'a marqué' — il + avoir (conjugué) + marqué (pp). Excellent !" },
+        { pre:"D'Jok", verb:"tirer", person:"je", q:`Conjugue "tirer" au passé composé à la 1re personne :`, answer:"ai tiré", hint:"j'___ tiré", feedback:"'ai tiré' — j'ai + tiré. Le Souffle t'appartient ! 🌬️" },
+        { pre:"Tia", verb:"passer", person:"elle", q:`Conjugue "passer" au passé composé à la 3e pers. sing. :`, answer:"a passé", hint:"elle ___ passé", feedback:"'a passé' — elle a + passé. Parfait !" },
+        { pre:"Rocket", verb:"arriver", person:"il", q:`"arriver" se conjugue avec ÊTRE. Conjugue à la 3e pers. sing. :`, answer:"est arrivé", hint:"il ___ arrivé", feedback:"'est arrivé' — il est + arrivé. Avec être, ça marche ! ✅" },
+        { pre:"Les Snow Kids", verb:"gagner", person:"ils", q:`Conjugue "gagner" à la 3e personne du PLURIEL :`, answer:"ont gagné", hint:"ils ___ gagné", feedback:"'ont gagné' — ils ont + gagné. PAS D'ACCORD avec avoir ! 🏆" },
+      ]
+    },
+
+    // ── MISSION 7 : présent indicatif ──
+    {
+      id: 7, title: "Mission 7 : Entraînement présent",
+      icon: '🔵', type: 'qcm',
+      badge: 'FACULTY • PRÉSENT',
+      story: `Clamp active l'Holotrainer. "${name}, pour progresser il faut aussi maîtriser le présent ! Les verbes du 1er groupe suivent tous le même schéma."`,
+      lesson: `Présent des verbes en <strong>-ER</strong> : je joue, tu joues, il joue, nous jouons, vous jouez, ils jouent.<br>
+      La base ne change pas, seule la terminaison change !`,
+      questions: [
+        { q: "« Tu ___ le ballon vers le but. » (tirer)", choices:["tires","tire","tirent","tirez"], answer:0, feedback:"Tu tires ! La terminaison est -es avec tu. ✅" },
+        { q: "« Ils ___ le terrain. » (traverser)", choices:["traverse","traverses","traversez","traversent"], answer:3, feedback:"Ils traversent ! -ent avec ils/elles. 🌟" },
+        { q: "« Nous ___ ensemble. » (entraîner)", choices:["entraîne","entraînes","entraînons","entraînent"], answer:2, feedback:"Nous entraînons ! -ons avec nous. ⚽" },
+        { q: "« Je ___ le Souffle. » (maîtriser)", choices:["maîtrises","maîtrise","maîtrisez","maîtrisent"], answer:1, feedback:"Je maîtrise ! -e avec je. Bravo !" },
+      ]
+    },
+
+    // ── MISSION 8 : imparfait ──
+    {
+      id: 8, title: "Mission 8 : Souvenirs d'Akillian",
+      icon: '❄️', type: 'qcm',
+      badge: 'AKILLIAN • IMPARFAIT',
+      story: `Aarch se souvient du passé : "Il y a 15 ans, avant la Grande Glaciation, l'équipe d'Akillian ___ tous les matchs. Aide-moi à conjuguer à l'imparfait, ${name}."`,
+      lesson: `Imparfait des verbes en <strong>-ER</strong> : je jouais, tu jouais, il jouait, nous jouions, vous jouiez, ils jouaient.<br>
+      La terminaison en -<strong>ais/-ait/-aient</strong> est la clé !`,
+      questions: [
+        { q: "« Avant, D'Jok ___ chaque jour. » (entraîner)", choices:["entraîne","entraînait","entraînera","a entraîné"], answer:1, feedback:"'entraînait' → imparfait ! -ait avec il/elle. ✅" },
+        { q: "« Nous ___ le Souffle. » (sentir, imparfait)", choices:["sentons","sentions","sentais","senti"], answer:1, feedback:"'sentions' → imparfait avec nous ! -ions. 🌬️" },
+        { q: "« Les joueurs ___ fort. » (courir → couraient)", choices:["courent","couraient","ont couru","courra"], answer:1, feedback:"'couraient' → imparfait avec ils ! -aient. ⚡" },
+        { q: "« Tu ___ toujours le premier. » (arriver, imparfait)", choices:["arrives","arriveras","arrivais","es arrivé"], answer:2, feedback:"'arrivais' → imparfait avec tu ! -ais. 🌟" },
+      ]
+    },
+
+    // ── MISSION 9 : futur ──
+    {
+      id: 9, title: "Mission 9 : Vers la Victoire !",
+      icon: '🚀', type: 'qcm',
+      badge: 'GALACTIK CUP • FUTUR',
+      story: `Tia motive l'équipe : "Un jour, nous ___ la Cup ! ${name}, conjugue ces verbes au futur pour allumer le Souffle !"`,
+      lesson: `Futur des verbes en <strong>-ER</strong> : je jouerai, tu joueras, il jouera, nous jouerons, vous jouerez, ils joueront.<br>
+      On ajoute -<strong>rai/-ras/-ra/-rons/-rez/-ront</strong> à l'infinitif !`,
+      questions: [
+        { q: "« Demain, nous ___ le match. » (gagner)", choices:["gagnons","gagnions","gagnerons","gagnons"], answer:2, feedback:"'gagnerons' → futur avec nous ! -ons sur l'infinitif. 🏆" },
+        { q: "« D'Jok ___ le but de la victoire. » (marquer)", choices:["marquait","marquera","a marqué","marque"], answer:1, feedback:"'marquera' → futur avec il ! -ra. ⚽" },
+        { q: "« Tu ___ le Souffle un jour ! » (maîtriser)", choices:["maîtriseras","maîtrisais","as maîtrisé","maîtrises"], answer:0, feedback:"'maîtriseras' → futur avec tu ! -ras. 🌬️" },
+        { q: "« Les Snow Kids ___ la galaxie ! » (épater)", choices:["épataient","ont épaté","épateront","épatent"], answer:2, feedback:"'épateront' → futur avec ils ! -ront. INCROYABLE ! 🌟" },
+      ]
+    },
+
+    // ── MISSION 10 : FINALE TOTALE ──
+    {
+      id: 10, title: "Mission FINALE : La Cup !!",
+      icon: '🏆', type: 'fill',
+      badge: 'GALACTIK FOOTBALL CUP • FINALE',
+      story: `La Galactik Football Cup est en jeu ! Aarch compte sur toi, ${name}. Prouve que tu es le/la meilleur(e) Snow Kid de la galaxie en conjuguant ces verbes !`,
+      lesson: `Récap' express :<br>
+      Présent : je <strong>joue</strong> | Imparfait : je <strong>jouais</strong> | Futur : je <strong>jouerai</strong> | Passé composé : j'<strong>ai joué</strong>`,
+      questions: [
+        { verb:"marquer", person:"il", tense:"futur", q:`Conjugue "marquer" au FUTUR (il) :`, answer:"marquera", hint:"il ___", feedback:"'marquera' → futur ! ⚽" },
+        { verb:"tirer", person:"nous", tense:"présent", q:`Conjugue "tirer" au PRÉSENT (nous) :`, answer:"tirons", hint:"nous ___", feedback:"'tirons' → présent ! ✅" },
+        { verb:"gagner", person:"ils", tense:"imparfait", q:`Conjugue "gagner" à l'IMPARFAIT (ils) :`, answer:"gagnaient", hint:"ils ___", feedback:"'gagnaient' → imparfait ! 🌟" },
+        { verb:"passer", person:"il", tense:"passé composé", q:`Conjugue "passer" au PASSÉ COMPOSÉ (il) :`, answer:"a passé", hint:"il ___", feedback:"'a passé' → passé composé ! 🏆" },
+        { verb:"arriver", person:"elle", tense:"passé composé", q:`"arriver" (être). Conjugue au PASSÉ COMPOSÉ (elle) :`, answer:"est arrivée", hint:"elle ___", feedback:"'est arrivée' ! Avec être, le pp s'accorde. Ici : féminin singulier → -ée. Bravo champion(ne) !" },
+      ]
+    },
+  ];
+}
+
+// ============================================================
+//  NAVIGATION
+// ============================================================
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showMap() {
+  showPage('page-map');
+  renderBoard();
+  updateGlobalStars();
+}
+
+// ============================================================
+//  START GAME
+// ============================================================
+function startGame() {
+  const input = document.getElementById('player-name').value.trim();
+  playerName = input || 'Champion';
+  missionStars = new Array(10).fill(0);
+  totalStars = 0;
+  currentMissionIndex = 0;
+  document.getElementById('map-name-display').textContent = playerName;
+  showMap();
+}
+
+// ============================================================
+//  BOARD RENDER
+// ============================================================
+function renderBoard() {
+  const missions = getMissions(playerName);
+  const track = document.getElementById('board-track');
+  track.innerHTML = '';
+
+  missions.forEach((m, idx) => {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+
+    const completed = missionStars[idx] > 0;
+    const isCurrent = idx === currentMissionIndex;
+    const locked = idx > currentMissionIndex;
+
+    if(completed) cell.classList.add('completed');
+    else if(isCurrent) cell.classList.add('current');
+    else if(locked) cell.classList.add('locked');
+
+    if(idx === 0) cell.classList.add('start');
+    if(idx === missions.length - 1) cell.classList.add('finish');
+
+    cell.innerHTML = `
+      <div class="cell-num">${idx+1}</div>
+      <div class="cell-icon">${m.icon}</div>
+      <div class="cell-label">${m.title.split(':')[1]?.trim() || m.title}</div>
+      ${isCurrent ? '<div class="player-token">⚽</div>' : ''}
+      ${completed ? `<div style="position:absolute;top:4px;left:4px;font-size:0.8rem;">${'⭐'.repeat(missionStars[idx])}</div>` : ''}
+    `;
+
+    if(!locked) cell.addEventListener('click', () => startMission(idx));
+    track.appendChild(cell);
+  });
+}
+
+function updateGlobalStars() {
+  totalStars = missionStars.reduce((a,b) => a+b, 0);
+  for(let i=1;i<=10;i++) {
+    const el = document.getElementById(`gs${i}`);
+    if(el) { el.className = 'star-icon ' + (totalStars >= i ? 'earned' : 'empty'); }
+  }
+}
+
+// ============================================================
+//  MISSION START
+// ============================================================
+function startMission(idx) {
+  currentMissionIndex = idx;
+  currentQuestionIndex = 0;
+  tempStars = 0;
+  const missions = getMissions(playerName);
+  const mission = missions[idx];
+  showPage('page-exercise');
+  document.getElementById('ex-breadcrumb').textContent = mission.title;
+  renderQuestion(mission, 0);
+  updateProgressBar(mission, 0);
+}
+
+function updateProgressBar(mission, qIdx) {
+  const total = mission.questions.length;
+  const pct = (qIdx / total) * 100;
+  document.getElementById('ex-progress-fill').style.width = pct + '%';
+  document.getElementById('ex-progress-label').textContent = `${qIdx} / ${total}`;
+  const stars = document.getElementById('ex-stars-display');
+  stars.innerHTML = '⭐'.repeat(missionStars[currentMissionIndex] || 0);
+}
+
+// ============================================================
+//  RENDER QUESTION
+// ============================================================
+function renderQuestion(mission, qIdx) {
+  const q = mission.questions[qIdx];
+  const area = document.getElementById('exercise-area');
+  document.getElementById('feedback-banner').style.display = 'none';
+  document.getElementById('btn-next').style.display = 'none';
+  selectedMatchA = null;
+
+  let html = '';
+
+  // Lesson box (first question only)
+  if(qIdx === 0 && mission.lesson) {
+    html += `<div class="lesson-box fade-in">📚 ${mission.lesson}</div>`;
+  }
+
+  html += `<div class="mission-card fade-in">`;
+  html += `<div class="mission-badge">🌌 ${mission.badge} • Q${qIdx+1}/${mission.questions.length}</div>`;
+
+  if(qIdx === 0 && mission.story) {
+    html += `<div class="mission-story">${mission.story}</div>`;
+  }
+
+  html += `<div class="mission-question">❓ ${q.q}</div>`;
+
+  if(mission.type === 'qcm' || mission.type === 'lesson+qcm') {
+    html += `<div class="choices-grid">`;
+    q.choices.forEach((c, ci) => {
+      html += `<button class="choice-btn" id="choice-${ci}" onclick="checkQCM(${ci}, ${q.answer}, '${escQ(q.feedback)}')">${c}</button>`;
+    });
+    html += `</div>`;
+  } else if(mission.type === 'fill') {
+    html += `<div class="fill-wrap">
+      <span style="font-size:1rem; color:var(--text-muted);">${q.hint ? q.hint.split('___')[0] : ''}</span>
+      <input class="fill-input" id="fill-input" type="text" placeholder="..." autocomplete="off" autocorrect="off" spellcheck="false"
+        onkeydown="if(event.key==='Enter') checkFill('${escQ(q.answer)}','${escQ(q.feedback)}')" />
+      <span style="font-size:1rem; color:var(--text-muted);">${q.hint ? q.hint.split('___')[1] || '' : ''}</span>
+    </div>
+    <button class="btn btn-blue" style="margin-top:1rem;" onclick="checkFill('${escQ(q.answer)}','${escQ(q.feedback)}')">Valider ✓</button>`;
+  }
+
+  html += `</div>`;
+  area.innerHTML = html;
+
+  if(mission.type === 'fill') {
+    setTimeout(() => { const inp = document.getElementById('fill-input'); if(inp) inp.focus(); }, 100);
+  }
+}
+
+function escQ(s) { return s.replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+
+// ============================================================
+//  CHECK ANSWERS
+// ============================================================
+function checkQCM(chosen, correct, feedback) {
+  const btns = document.querySelectorAll('.choice-btn');
+  btns.forEach(b => b.disabled = true);
+  btns[chosen].classList.add(chosen === correct ? 'correct' : 'wrong');
+  if(chosen !== correct) btns[correct].classList.add('correct');
+  showFeedback(chosen === correct, feedback);
+  if(chosen === correct) tempStars++;
+}
+
+function checkFill(correct, feedback) {
+  const inp = document.getElementById('fill-input');
+  if(!inp) return;
+  const val = inp.value.trim().toLowerCase().replace(/['']/g, "'");
+  const answers = correct.toLowerCase().split('|');
+  const ok = answers.some(a => val === a.trim());
+  inp.disabled = true;
+  inp.classList.add(ok ? 'correct' : 'wrong');
+  if(!ok) {
+    const hint = document.createElement('div');
+    hint.style.cssText='margin-top:6px;font-size:0.85rem;color:var(--text-muted);';
+    hint.textContent = `✓ Réponse : ${correct}`;
+    inp.parentNode.appendChild(hint);
+  }
+  showFeedback(ok, feedback);
+  if(ok) tempStars++;
+}
+
+function showFeedback(ok, msg) {
+  const fb = document.getElementById('feedback-banner');
+  fb.className = 'feedback-banner ' + (ok ? 'correct' : 'wrong');
+  fb.textContent = ok ? '✅ ' + msg : '❌ ' + msg;
+  fb.style.display = 'block';
+  document.getElementById('btn-next').style.display = 'block';
+}
+
+// ============================================================
+//  NEXT QUESTION / END MISSION
+// ============================================================
+function nextQuestion() {
+  const missions = getMissions(playerName);
+  const mission = missions[currentMissionIndex];
+  currentQuestionIndex++;
+  updateProgressBar(mission, currentQuestionIndex);
+
+  if(currentQuestionIndex >= mission.questions.length) {
+    endMission(mission);
+  } else {
+    renderQuestion(mission, currentQuestionIndex);
+  }
+}
+
+function endMission(mission) {
+  const total = mission.questions.length;
+  const stars = Math.round((tempStars / total) * 3);
+  missionStars[currentMissionIndex] = Math.max(missionStars[currentMissionIndex] || 0, stars);
+
+  // Advance pointer
+  if(currentMissionIndex < getMissions(playerName).length - 1 && stars > 0) {
+    if(currentMissionIndex === currentMissionIndex) {
+      // progress to next
+    }
+  }
+
+  showVictory(mission, stars, total);
+}
+
+// ============================================================
+//  VICTORY SPLASH
+// ============================================================
+function showVictory(mission, stars, total) {
+  const splash = document.getElementById('victory-splash');
+  document.getElementById('victory-title').textContent = stars >= 3 ? 'Mission accomplie !' : stars >= 2 ? 'Bien joué !' : 'Continue à t\'entraîner !';
+  document.getElementById('victory-sub').textContent = `${tempStars} bonne${tempStars>1?'s':''} réponse${tempStars>1?'s':''} sur ${total}`;
+  const vs = document.getElementById('victory-stars');
+  vs.innerHTML = '';
+  for(let i=0;i<3;i++) {
+    const s = document.createElement('span');
+    s.className = 'star-icon ' + (i < stars ? 'earned' : 'empty');
+    s.style.fontSize = '2rem';
+    s.textContent = '⭐';
+    vs.appendChild(s);
+  }
+  splash.classList.add('show');
+  if(stars >= 2) launchConfetti();
+}
+
+function closeVictory() {
+  document.getElementById('victory-splash').classList.remove('show');
+  const missions = getMissions(playerName);
+
+  // Advance if needed
+  if(missionStars[currentMissionIndex] > 0 && currentMissionIndex < missions.length - 1) {
+    currentMissionIndex++;
+  }
+
+  // Check if all done
+  const allDone = missionStars.slice(0, missions.length).every(s => s > 0);
+  if(allDone) {
+    showEndScreen();
+  } else {
+    showMap();
+  }
+}
+
+// ============================================================
+//  END SCREEN
+// ============================================================
+function showEndScreen() {
+  showPage('page-end');
+  const total = missionStars.reduce((a,b) => a+b, 0);
+  document.getElementById('end-score-text').innerHTML = `${playerName} a remporté <span>${total}</span> étoile${total>1?'s':''} sur 30 !`;
+  document.getElementById('end-story').innerHTML = `
+    <p>🏆 <strong>Incroyable, ${playerName} !</strong> Tu as guidé les Snow Kids jusqu'à la Galactik Football Cup !</p>
+    <p>Aarch te soulève dans les bras : "Je savais que tu étais le/la meilleur(e) joueur(se) de la galaxie ! Ton Souffle de la conjugaison est sans égal !"</p>
+    <p>D'Jok, Tia, Micro-Ice, Rocket, Ahito, Thran et Meï crient ton nom dans le stade !</p>
+    <p style="margin-top:0.5rem; font-size:0.85rem; color:var(--text-muted);">🌟 Rappel de ta leçon : verbes 1er groupe → participe passé en -<strong>É</strong> | Avec AVOIR : pas d'accord ! | Avec ÊTRE : on accorde.</p>
+  `;
+  launchConfetti();
+}
+
+function replayGame() {
+  missionStars = new Array(10).fill(0);
+  totalStars = 0;
+  currentMissionIndex = 0;
+  showPage('page-intro');
+}
+
+// ============================================================
+//  CONFETTI
+// ============================================================
+function launchConfetti() {
+  const colors = ['#ffd93d','#4da6ff','#2ecc71','#ff4455','#8b5cf6','#ff9f43'];
+  for(let i=0;i<60;i++){
+    const c = document.createElement('div');
+    c.className = 'confetti-piece';
+    c.style.cssText = `left:${Math.random()*100}vw;top:-10px;background:${colors[Math.floor(Math.random()*colors.length)]};animation-delay:${Math.random()*2}s;animation-duration:${2+Math.random()*2}s;transform:rotate(${Math.random()*360}deg);`;
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 5000);
+  }
+}
+
+// ============================================================
+//  ENTER KEY on name input
+// ============================================================
+document.getElementById('player-name').addEventListener('keydown', e => {
+  if(e.key === 'Enter') startGame();
+});
+</script>
+</body>
+</html>
