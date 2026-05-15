@@ -1368,10 +1368,12 @@ function renderPuzzle(card,step){
   card.innerHTML=`<div class="q-text">🧩 Clique sur un infinitif, puis sur son participe passé.</div>`;
 
   const grid=document.createElement('div');
+  grid.className='puzzle-grid';
   grid.style.cssText='display:flex;gap:16px;';
 
   const lc=document.createElement('div');
   lc.style.cssText='flex:1;display:flex;flex-direction:column;gap:8px;';
+
   const rc=document.createElement('div');
   rc.style.cssText='flex:1;display:flex;flex-direction:column;gap:8px;';
 
@@ -1379,67 +1381,111 @@ function renderPuzzle(card,step){
     const el=makePuzzlePiece(p.left,'left');
     lc.appendChild(el);
   });
+
   rights.forEach(r=>{
     const el=makePuzzlePiece(r,'right');
     rc.appendChild(el);
   });
+
   grid.appendChild(lc);
   grid.appendChild(rc);
+
   grid._pairs=step.pairs;
+
   card.appendChild(grid);
 }
 
 function makePuzzlePiece(text,side){
   const el=document.createElement('div');
+
   el.className='puzzle-piece';
   el.textContent=text;
+
   el.dataset.side=side;
   el.dataset.val=text;
+
   el.onclick=()=>handlePuzzleClick(el);
+
   return el;
 }
 
 function handlePuzzleClick(el){
+
   if(el.classList.contains('matched')) return;
+
   const side=el.dataset.side;
 
+  // première sélection
   if(!puzzleState.selected){
     puzzleState.selected=el;
     puzzleState.side=side;
+
     el.classList.add('selected');
     return;
   }
+
+  // si on reclique du même côté
   if(puzzleState.side===side){
     puzzleState.selected.classList.remove('selected');
+
     puzzleState.selected=el;
+    puzzleState.side=side;
+
     el.classList.add('selected');
     return;
   }
 
-  const leftVal  = side==='right' ? puzzleState.selected.dataset.val : el.dataset.val;
-  const rightVal = side==='right' ? el.dataset.val : puzzleState.selected.dataset.val;
-  const leftEl   = side==='right' ? puzzleState.selected : el;
-  const rightEl  = side==='right' ? el : puzzleState.selected;
+  const leftVal  = side==='right'
+    ? puzzleState.selected.dataset.val
+    : el.dataset.val;
 
-  const grid=el.closest('div[style*="flex;gap"]');
-  const pair=grid._pairs.find(p=>p.left===leftVal && p.right===rightVal);
+  const rightVal = side==='right'
+    ? el.dataset.val
+    : puzzleState.selected.dataset.val;
+
+  const leftEl = side==='right'
+    ? puzzleState.selected
+    : el;
+
+  const rightEl = side==='right'
+    ? el
+    : puzzleState.selected;
+
+  const grid = el.closest('.puzzle-grid');
+
+  const pair = grid._pairs.find(
+    p => p.left===leftVal && p.right===rightVal
+  );
 
   puzzleState.selected.classList.remove('selected');
 
   if(pair){
+
     leftEl.classList.add('matched');
     rightEl.classList.add('matched');
+
     puzzleState.matched++;
+
     if(puzzleState.matched===puzzleState.total){
+
       G.tempCorrect++;
+
       showFeedback(true,'Toutes les pièces sont assemblées ! 🧩🌟');
+
       showNext();
     }
+
   } else {
+
     leftEl.classList.add('error-flash');
     rightEl.classList.add('error-flash');
-    setTimeout(()=>{leftEl.classList.remove('error-flash');rightEl.classList.remove('error-flash');},600);
+
+    setTimeout(()=>{
+      leftEl.classList.remove('error-flash');
+      rightEl.classList.remove('error-flash');
+    },600);
   }
+
   puzzleState.selected=null;
   puzzleState.side=null;
 }
